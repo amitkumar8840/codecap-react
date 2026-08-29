@@ -406,3 +406,19 @@ footer{background:var(--dk);color:rgba(255,255,255,.5);padding:2.5rem 2rem}
     padding: 25px;
   }
 }
+
+/* Portfolio card text fix */
+.prod-card {
+  min-width: 0;
+}
+
+.prod-card p,
+.prod-card div {
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-height: 1.6;
+}
+
+.prod-card span {
+  margin-right: 8px;
+}
