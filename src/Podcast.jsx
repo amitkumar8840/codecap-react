@@ -1,1176 +1,1246 @@
-import { useEffect } from "react";
-import "./styles.css";
+import React, { useEffect, useState } from "react";
 
 function Podcast() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) =>
+    const elements = document.querySelectorAll(".pc-reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            entry.target.classList.add("pc-visible");
           }
-        }),
+        });
+      },
       { threshold: 0.1 }
     );
 
-    document.querySelectorAll(".reveal").forEach((el) => obs.observe(el));
+    elements.forEach((element) => observer.observe(element));
 
-    return () => obs.disconnect();
+    return () => observer.disconnect();
   }, []);
+
+  const formats = [
+    {
+      number: "01",
+      title: "Founder Stories",
+      text:
+        "Direct conversations with founders building ambitious companies from zero."
+    },
+    {
+      number: "02",
+      title: "Market Intel",
+      text:
+        "What is actually happening across Southeast Asia, the Gulf and South Asia."
+    },
+    {
+      number: "03",
+      title: "The Operator's Playbook",
+      text:
+        "Practical lessons from people responsible for building, selling and operating."
+    },
+    {
+      number: "04",
+      title: "VC Perspectives",
+      text:
+        "Conversations around capital, investment decisions and what investors are looking for."
+    }
+  ];
+
+  const episodes = [
+    {
+      episode: "EP 05",
+      status: "NEW",
+      title:
+        "Building for the Gulf: What Founders Need to Know Before Entering the Market",
+      description:
+        "A practical conversation about market entry, relationships, sales and building trust in the Gulf.",
+      duration: "42 min",
+      date: "May 2025"
+    },
+    {
+      episode: "EP 04",
+      status: "",
+      title:
+        "From Product to Pipeline: The Reality of Enterprise GTM",
+      description:
+        "Why great products do not automatically create enterprise pipeline — and what operators can do about it.",
+      duration: "38 min",
+      date: "April 2025"
+    },
+    {
+      episode: "EP 03",
+      status: "",
+      title:
+        "Cybersecurity in the Age of AI",
+      description:
+        "How AI is changing security teams, products and the threat landscape.",
+      duration: "45 min",
+      date: "March 2025"
+    },
+    {
+      episode: "EP 02",
+      status: "",
+      title:
+        "The Operator's Guide to Southeast Asia",
+      description:
+        "What changes when a startup expands across one of the world's most diverse technology markets.",
+      duration: "41 min",
+      date: "February 2025"
+    },
+    {
+      episode: "EP 01",
+      status: "",
+      title:
+        "Why We Built CodeCap",
+      description:
+        "The story behind CodeCap Ventures and the venture studio model we are building.",
+      duration: "36 min",
+      date: "January 2025"
+    }
+  ];
+
+  const guests = [
+    "VC Partners",
+    "CISOs",
+    "Founders",
+    "GTM Operators",
+    "AI Engineers",
+    "Regulatory Experts",
+    "Legal & Structuring",
+    "CodeCap Team"
+  ];
 
   return (
     <>
       <style>{`
-        :root {
-          --surface: #f7f9fc;
-          --card: #eef3f8;
-          --text: #293033;
-          --accent: #f01965;
-          --accent2: #f01965;
-          --ff-display: 'Raleway', sans-serif;
-          --ff-body: 'Open Sans', sans-serif;
-          --radius-md: 8px;
-          --radius-sm: 6px;
-          --transition: .2s;
+        * {
+          box-sizing: border-box;
         }
 
-        /* =========================
-           PODCAST FONT + COLOR FIX
-        ========================= */
-
-        .podcast-hero h1,
-        .podcast-hero h2,
-        .podcast-hero h3,
-        .format-card h3,
-        .ep-num,
-        .ep-title,
-        .guest-avatar,
-        .sub-strip h2 {
-          font-family: 'Raleway', sans-serif !important;
+        html {
+          scroll-behavior: smooth;
         }
 
-        .podcast-hero h1 {
-          font-family: 'Raleway', sans-serif !important;
-          font-size: clamp(2.5rem, 5vw, 4.5rem) !important;
-          font-weight: 900 !important;
-          color: #f01965 !important;
-          line-height: 1.08 !important;
-          letter-spacing: -0.02em !important;
-          margin: 0 0 1rem !important;
+        body {
+          margin: 0;
+          background: #08090d;
+          color: #fff;
+          font-family: "Open Sans", Arial, sans-serif;
         }
 
-        .podcast-hero p {
-          font-family: 'Open Sans', sans-serif !important;
-          color: #6b7a8d !important;
-          line-height: 1.8 !important;
+        a {
+          color: inherit;
+          text-decoration: none;
         }
 
-        .podcast-brand {
-          font-family: 'Raleway', sans-serif !important;
-          color: #f01965 !important;
-          font-weight: 700 !important;
+        button,
+        input {
+          font-family: inherit;
         }
 
-        .format-card h3 {
-          font-family: 'Raleway', sans-serif !important;
-          font-weight: 800 !important;
+        /* NAVBAR */
+
+        .pc-nav {
+          position: fixed;
+          z-index: 1000;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(1180px, calc(100% - 32px));
+          padding: 14px 18px;
+          border-radius: 22px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(10,11,17,.78);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.3);
         }
 
-        .ep-num {
-          font-family: 'Raleway', sans-serif !important;
-          font-weight: 700 !important;
+        .pc-nav-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
         }
 
-        .ep-title {
-          font-family: 'Raleway', sans-serif !important;
-          font-weight: 700 !important;
+        .pc-logo {
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: -1.5px;
         }
 
-        .guest-avatar {
-          font-family: 'Raleway', sans-serif !important;
-          font-weight: 700 !important;
+        .pc-logo span {
+          color: #f01965;
         }
 
-        .sub-strip h2 {
-          font-family: 'Raleway', sans-serif !important;
-          font-weight: 800 !important;
+        .pc-links {
+          display: flex;
+          align-items: center;
+          gap: 21px;
+        }
+
+        .pc-links a {
+          color: rgba(255,255,255,.68);
+          font-size: 13px;
+          font-weight: 700;
+          transition: .25s ease;
+        }
+
+        .pc-links a:hover,
+        .pc-active {
+          color: #fff !important;
+        }
+
+        .pc-talk {
+          border: 0;
+          padding: 13px 20px;
+          border-radius: 13px;
+          background: linear-gradient(
+            135deg,
+            #f01965,
+            #b70b6d
+          );
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .pc-menu {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.05);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+        }
+
+        .pc-mobile-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          right: 0;
+          padding: 10px;
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,.1);
+          background: rgba(10,11,17,.97);
+          backdrop-filter: blur(20px);
+        }
+
+        .pc-mobile-menu a {
+          display: block;
+          padding: 14px;
+          border-radius: 12px;
+          color: rgba(255,255,255,.7);
+          font-size: 13px;
+          font-weight: 700;
         }
 
         /* HERO */
-        .podcast-hero {
-          min-height: 70vh;
+
+        .pc-hero {
+          position: relative;
+          min-height: 88vh;
           display: flex;
           align-items: center;
-          padding: 8rem 4rem 4rem;
-          background: var(--surface);
-          position: relative;
+          padding: 150px 7vw 100px;
           overflow: hidden;
         }
 
-        .podcast-hero-glow {
-          position: absolute;
-          width: 800px;
-          height: 600px;
-          background: radial-gradient(
-            circle,
-            rgba(10,245,160,0.05) 0%,
-            transparent 65%
-          );
-          bottom: -200px;
-          right: -200px;
-          pointer-events: none;
-        }
-
-        .podcast-hero-grid {
+        .pc-grid {
           position: absolute;
           inset: 0;
           background-image:
             linear-gradient(
-              rgba(10,245,160,0.03) 1px,
+              rgba(255,255,255,.035) 1px,
               transparent 1px
             ),
             linear-gradient(
               90deg,
-              rgba(10,245,160,0.03) 1px,
+              rgba(255,255,255,.035) 1px,
               transparent 1px
             );
-          background-size: 50px 50px;
-          mask-image: radial-gradient(
-            ellipse 70% 70% at 70% 50%,
-            black 30%,
-            transparent 100%
+          background-size: 60px 60px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent
           );
         }
 
-        .podcast-hero-content {
+        .pc-glow {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(100px);
+          opacity: .2;
+        }
+
+        .pc-glow-one {
+          width: 450px;
+          height: 450px;
+          left: -180px;
+          top: 80px;
+          background: #f01965;
+          animation: pcFloat 8s ease-in-out infinite alternate;
+        }
+
+        .pc-glow-two {
+          width: 420px;
+          height: 420px;
+          right: -180px;
+          bottom: -40px;
+          background: #029fe7;
+          animation: pcFloat 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes pcFloat {
+          to {
+            transform: translate(70px,-45px) scale(1.2);
+          }
+        }
+
+        .pc-hero-inner {
           position: relative;
           z-index: 2;
-          max-width: 700px;
+          width: 100%;
+          max-width: 1180px;
+          margin: auto;
         }
 
-        .podcast-logo {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-
-        .podcast-icon {
-          width: 72px;
-          height: 72px;
-          background: #f01965;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-          flex-shrink: 0;
-        }
-
-        .podcast-brand {
-          font-size: 0.75rem;
-          letter-spacing: 0.15em;
+        .pc-eyebrow {
+          display: inline-flex;
+          padding: 8px 13px;
+          border-radius: 100px;
+          border: 1px solid rgba(255,255,255,.13);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.62);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .15em;
           text-transform: uppercase;
         }
 
-        .podcast-platforms {
+        .pc-hero h1 {
+          margin: 25px 0 0;
+          max-width: 950px;
+          font-size: clamp(70px,10vw,130px);
+          line-height: .8;
+          letter-spacing: -7px;
+          font-weight: 900;
+        }
+
+        .pc-gradient {
+          background:
+            linear-gradient(
+              100deg,
+              #f01965,
+              #ff5790,
+              #029fe7
+            );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: pcGradient 5s linear infinite;
+        }
+
+        @keyframes pcGradient {
+          to {
+            background-position: 200% center;
+          }
+        }
+
+        .pc-hero-copy {
+          max-width: 720px;
+          margin-top: 35px;
+          color: rgba(255,255,255,.56);
+          font-size: 16px;
+          line-height: 1.85;
+        }
+
+        .pc-by {
+          margin-top: 25px;
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        /* PLATFORMS */
+
+        .pc-platforms {
           display: flex;
-          gap: 0.75rem;
           flex-wrap: wrap;
-          margin-top: 2rem;
+          gap: 9px;
+          margin-top: 35px;
         }
 
-        .platform-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.8rem;
-          font-weight: 500;
-          padding: 0.55rem 1.1rem;
-          border: 1px solid var(--border);
+        .pc-platform {
+          padding: 9px 13px;
           border-radius: 100px;
-          color: var(--muted);
-          transition: all var(--transition);
+          border: 1px solid rgba(255,255,255,.1);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.55);
+          font-size: 10px;
+          font-weight: 800;
         }
 
-        .platform-btn:hover {
-          border-color: #f01965;
+        /* SECTIONS */
+
+        .pc-section {
+          padding: 110px 7vw;
+        }
+
+        .pc-container {
+          max-width: 1180px;
+          margin: auto;
+        }
+
+        .pc-label {
           color: #f01965;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+          margin-bottom: 16px;
         }
 
-        /* FORMAT BANDS */
-        .format-grid {
+        .pc-title {
+          margin: 0;
+          font-size: clamp(43px,5vw,72px);
+          line-height: .96;
+          letter-spacing: -3px;
+        }
+
+        .pc-title span {
+          color: rgba(255,255,255,.3);
+        }
+
+        /* FORMAT */
+
+        .pc-format-grid {
+          margin-top: 60px;
           display: grid;
-          grid-template-columns: repeat(2,1fr);
-          gap: 2rem;
+          grid-template-columns: repeat(4,1fr);
+          gap: 15px;
         }
 
-        .format-card {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          padding: 2rem;
-          transition: border-color var(--transition);
+        .pc-format {
+          min-height: 290px;
+          padding: 25px;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.035);
+          transition: .3s ease;
         }
 
-        .format-card:hover {
-          border-color: rgba(10,245,160,0.3);
+        .pc-format:hover {
+          transform: translateY(-8px);
+          border-color: rgba(240,25,101,.3);
+          background: rgba(255,255,255,.055);
         }
 
-        .format-icon {
-          font-size: 1.5rem;
-          margin-bottom: 1rem;
+        .pc-format-number {
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
         }
 
-        .format-card h3 {
-          margin-bottom: 0.5rem;
+        .pc-format h3 {
+          margin: 75px 0 13px;
+          font-size: 20px;
+          letter-spacing: -.5px;
         }
 
-        .format-card p {
-          font-size: 0.875rem;
-          color: var(--muted);
+        .pc-format p {
+          margin: 0;
+          color: rgba(255,255,255,.42);
+          font-size: 12px;
           line-height: 1.7;
         }
 
         /* EPISODES */
-        .episode-list {
+
+        .pc-episode-list {
+          margin-top: 60px;
           display: flex;
           flex-direction: column;
-          gap: 1px;
-          background: var(--border);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          overflow: hidden;
+          gap: 10px;
         }
 
-        .episode-row {
-          background: var(--surface);
-          padding: 2rem 2.5rem;
+        .pc-episode {
           display: grid;
-          grid-template-columns: 64px 1fr auto;
-          gap: 1.5rem;
+          grid-template-columns: 90px 1fr 110px;
+          gap: 25px;
           align-items: center;
-          transition: background var(--transition);
-          cursor: pointer;
+          padding: 25px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.03);
+          transition: .3s ease;
         }
 
-        .episode-row:hover {
-          background: var(--card);
+        .pc-episode:hover {
+          transform: translateX(7px);
+          border-color: rgba(2,159,231,.25);
+          background: rgba(255,255,255,.05);
         }
 
-        .ep-num {
-          font-size: 0.75rem;
-          color: #f01965;
-          letter-spacing: 0.08em;
-          text-align: center;
+        .pc-episode-no {
+          color: #029fe7;
+          font-size: 11px;
+          font-weight: 900;
         }
 
-        .ep-play {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          border: 1px solid #f01965;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #f01965;
-          font-size: 0.8rem;
-          flex-shrink: 0;
-          transition: background var(--transition);
-        }
-
-        .episode-row:hover .ep-play {
+        .pc-new {
+          display: inline-flex;
+          margin-left: 7px;
+          padding: 4px 6px;
+          border-radius: 5px;
           background: #f01965;
-          color: var(--bg);
+          color: #fff;
+          font-size: 7px;
+          vertical-align: middle;
         }
 
-        .ep-tag {
-          font-size: 0.68rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #f01965;
-          margin-bottom: 0.35rem;
-          font-weight: 500;
+        .pc-episode h3 {
+          margin: 0 0 8px;
+          font-size: 18px;
+          line-height: 1.3;
         }
 
-        .ep-title {
-          font-size: 1rem;
-          letter-spacing: -0.01em;
-          margin-bottom: 0.35rem;
-        }
-
-        .ep-desc {
-          font-size: 0.82rem;
-          color: var(--muted);
+        .pc-episode p {
+          margin: 0;
+          color: rgba(255,255,255,.4);
+          font-size: 11px;
           line-height: 1.6;
         }
 
-        .ep-info {
+        .pc-episode-meta {
+          color: rgba(255,255,255,.35);
+          font-size: 9px;
+          font-weight: 800;
           text-align: right;
-        }
-
-        .ep-duration {
-          font-size: 0.78rem;
-          color: var(--muted);
-        }
-
-        .ep-date {
-          font-size: 0.72rem;
-          color: var(--muted);
-          margin-top: 0.25rem;
-        }
-
-        .ep-new {
-          display: inline-block;
-          font-size: 0.62rem;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          background: #f01965;
-          color: white;
-          padding: 0.15rem 0.45rem;
-          border-radius: 2px;
-          margin-top: 0.4rem;
+          line-height: 1.8;
         }
 
         /* GUEST WALL */
-        .guest-grid {
+
+        .pc-guest-section {
+          background: #f4f5f7;
+          color: #08090d;
+        }
+
+        .pc-guest-section .pc-title span {
+          color: #747983;
+        }
+
+        .pc-guest-grid {
+          margin-top: 55px;
           display: grid;
           grid-template-columns: repeat(4,1fr);
-          gap: 2rem;
+          gap: 12px;
         }
 
-        .guest-card {
+        .pc-guest {
+          min-height: 150px;
+          padding: 20px;
+          border-radius: 19px;
+          background: #fff;
+          border: 1px solid #e0e3e8;
           display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 0.75rem;
-        }
-
-        .guest-avatar {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          background: var(--card);
-          border: 1px solid var(--border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.1rem;
-          color: #f01965;
-        }
-
-        .guest-name {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.88rem;
-          font-weight: 500;
-          color: var(--text);
-        }
-
-        .guest-role {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.75rem;
-          color: var(--muted);
-          line-height: 1.4;
-        }
-
-        /* SUBSCRIBE STRIP */
-        .sub-strip {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 3rem;
-          align-items: center;
-        }
-
-        .sub-strip h2 {
-          font-size: clamp(1.5rem,2.5vw,2rem);
-        }
-
-        .sub-links {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .sub-link {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 1rem 1.25rem;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          transition: border-color var(--transition);
-        }
-
-        .sub-link:hover {
-          border-color: rgba(10,245,160,0.3);
-        }
-
-        .sub-link-icon {
-          font-size: 1.2rem;
-        }
-
-        .sub-link-text {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.85rem;
-          color: var(--text);
-          font-weight: 500;
-        }
-
-        .sub-link-sub {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.75rem;
-          color: var(--muted);
-        }
-
-        /* NAV */
-        .nav-in {
-          max-width: 1140px;
-          margin: 0 auto;
-          padding: 0 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 68px;
-        }
-
-        nav {
-          position: sticky;
-          top: 0;
-          z-index: 200;
-          background: rgba(255,255,255,.97);
-          backdrop-filter: blur(14px);
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 1px 16px rgba(0,0,0,.06);
-        }
-
-        .logo {
-          font-family: 'Raleway', sans-serif;
-          font-size: 1.35rem;
+          align-items: flex-end;
+          font-size: 15px;
           font-weight: 900;
-          color: #111;
-          letter-spacing: -.02em;
-          text-decoration: none;
+          transition: .3s ease;
         }
 
-        .logo span {
+        .pc-guest:hover {
+          transform: translateY(-7px);
+          box-shadow: 0 25px 60px rgba(0,0,0,.08);
+        }
+
+        .pc-guest-number {
+          position: absolute;
           color: #f01965;
+          font-size: 9px;
         }
 
-        .nav-links {
+        /* SUBSCRIBE */
+
+        .pc-subscribe {
+          padding: 130px 7vw;
+          text-align: center;
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(240,25,101,.13),
+              transparent 42%
+            );
+        }
+
+        .pc-subscribe-inner {
+          max-width: 850px;
+          margin: auto;
+        }
+
+        .pc-subscribe h2 {
+          margin: 0;
+          font-size: clamp(48px,6vw,78px);
+          line-height: .94;
+          letter-spacing: -4px;
+        }
+
+        .pc-subscribe p {
+          max-width: 600px;
+          margin: 25px auto 30px;
+          color: rgba(255,255,255,.44);
+          font-size: 13px;
+          line-height: 1.8;
+        }
+
+        .pc-sub-links {
           display: flex;
-          gap: .15rem;
-          list-style: none;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 9px;
         }
 
-        .nav-links a {
-          font-family: 'Open Sans', sans-serif;
-          font-size: .78rem;
-          font-weight: 600;
-          color: #444;
-          padding: .45rem .8rem;
-          border-radius: 5px;
-          transition: color .2s,background .2s;
-          text-decoration: none;
+        .pc-sub-link {
+          padding: 12px 16px;
+          border-radius: 11px;
+          border: 1px solid rgba(255,255,255,.1);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.7);
+          font-size: 10px;
+          font-weight: 900;
+          transition: .25s ease;
         }
 
-        .nav-links a:hover,
-        .nav-links a.on {
-          color: #f01965;
-          background: rgba(240,25,101,.06);
+        .pc-sub-link:hover {
+          background: #fff;
+          color: #08090d;
         }
 
-        .btn-talk {
-          font-family: 'Open Sans', sans-serif;
-          font-size: .78rem;
-          font-weight: 700;
-          padding: .55rem 1.4rem;
-          background: #111;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: background .2s;
+        /* GUEST CTA */
+
+        .pc-guest-cta {
+          margin-top: 80px;
+          padding: 30px;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.035);
         }
 
-        .btn-talk:hover {
+        .pc-guest-cta h3 {
+          margin: 0;
+          font-size: 24px;
+        }
+
+        .pc-guest-cta p {
+          margin: 10px auto 20px;
+        }
+
+        .pc-guest-button {
+          display: inline-flex;
+          padding: 13px 18px;
+          border-radius: 12px;
           background: #f01965;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 900;
         }
 
         /* FOOTER */
-        .f-in {
-          max-width: 1140px;
-          margin: 0 auto;
+
+        .pc-footer {
+          padding: 35px 7vw;
+          border-top: 1px solid rgba(255,255,255,.08);
+          background: #07080b;
+        }
+
+        .pc-footer-inner {
+          max-width: 1180px;
+          margin: auto;
           display: flex;
-          align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 1rem;
+          align-items: center;
+          gap: 20px;
         }
 
-        .f-brand {
-          font-family: 'Raleway', sans-serif;
-          font-size: 1.05rem;
+        .pc-footer-logo {
+          font-size: 23px;
           font-weight: 900;
-          color: white;
         }
 
-        .f-brand span {
+        .pc-footer-logo span {
           color: #f01965;
         }
 
-        .f-links {
-          display: flex;
-          gap: 1.5rem;
-          flex-wrap: wrap;
+        .pc-footer-text {
+          color: rgba(255,255,255,.38);
+          font-size: 11px;
+          line-height: 1.7;
+          text-align: right;
         }
 
-        .f-links a {
-          font-family: 'Open Sans', sans-serif;
-          font-size: .75rem;
-          color: rgba(255,255,255,.45);
-          transition: color .2s;
-          text-decoration: none;
+        /* REVEAL */
+
+        .pc-reveal {
+          opacity: 0;
+          transform: translateY(40px);
+          transition:
+            opacity .8s ease,
+            transform .8s cubic-bezier(.2,.8,.2,1);
         }
 
-        .f-links a:hover {
-          color: #f01965;
+        .pc-visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
-        .f-meta {
-          font-family: 'Open Sans', sans-serif;
-          font-size: .72rem;
-        }
+        /* MOBILE */
 
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-          .format-grid {
-            grid-template-columns: 1fr;
-          }
+        @media (max-width: 1050px) {
 
-          .guest-grid {
-            grid-template-columns: repeat(2,1fr);
-          }
-
-          .sub-strip {
-            grid-template-columns: 1fr;
-          }
-
-          .episode-row {
-            grid-template-columns: 64px 1fr;
-          }
-
-          .ep-info {
-            grid-column: 2;
-            text-align: left;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .podcast-hero {
-            padding: 6rem 1.5rem 3rem;
-          }
-
-          .nav-links {
+          .pc-links,
+          .pc-talk {
             display: none;
           }
 
-          .nav-in {
-            padding: 0 1rem;
+          .pc-menu {
+            display: block;
           }
 
-          .guest-grid {
+          .pc-format-grid {
             grid-template-columns: 1fr 1fr;
+          }
+
+          .pc-guest-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        @media (max-width: 760px) {
+
+          .pc-nav {
+            top: 8px;
+            width: calc(100% - 18px);
+            border-radius: 18px;
+          }
+
+          .pc-hero {
+            min-height: auto;
+            padding: 130px 20px 80px;
+          }
+
+          .pc-hero h1 {
+            font-size: 64px;
+            letter-spacing: -4px;
+          }
+
+          .pc-hero-copy {
+            font-size: 14px;
+          }
+
+          .pc-section {
+            padding: 80px 20px;
+          }
+
+          .pc-title {
+            font-size: 44px;
+            letter-spacing: -2px;
+          }
+
+          .pc-format-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .pc-format {
+            min-height: 230px;
+          }
+
+          .pc-format h3 {
+            margin-top: 55px;
+          }
+
+          .pc-episode {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 22px;
+          }
+
+          .pc-episode-meta {
+            text-align: left;
+          }
+
+          .pc-guest-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .pc-guest {
+            min-height: 110px;
+          }
+
+          .pc-subscribe {
+            padding: 95px 20px;
+          }
+
+          .pc-subscribe h2 {
+            font-size: 52px;
+            letter-spacing: -3px;
+          }
+
+          .pc-footer {
+            padding: 28px 20px;
+          }
+
+          .pc-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .pc-footer-text {
+            text-align: left;
           }
         }
       `}</style>
 
-      <nav>
-        <div className="nav-in">
-          <a href="/" className="logo">
-            Code<span>Cap</span>
-          </a>
+      <div>
 
-          <ul className="nav-links">
-            <li><a href="/venture-studio">Venture Studio</a></li>
-            <li><a href="/services">Services</a></li>
-            <li><a href="/products">Products</a></li>
-            <li><a href="/portfolio">Portfolio</a></li>
-            <li><a href="/team">Team</a></li>
-            <li><a href="/insights">Insights</a></li>
-            <li><a href="/podcast">Podcast</a></li>
-          </ul>
+        {/* NAVBAR */}
 
-          <button
-            className="btn-talk"
-            onClick={() => {
-              window.location.href = "mailto:hello@codecap.ai";
-            }}
-          >
-            Talk to us
-          </button>
-        </div>
-      </nav>
+        <nav className="pc-nav">
 
-      {/* HERO */}
-      <section className="podcast-hero">
-        <div className="podcast-hero-glow"></div>
-        <div className="podcast-hero-grid"></div>
+          <div className="pc-nav-inner">
 
-        <div className="podcast-hero-content reveal">
-          <div className="podcast-logo">
-            <div className="podcast-icon">🎙️</div>
+            <a href="/" className="pc-logo">
+              Code<span>Cap</span>
+            </a>
 
-            <div>
-              <div className="podcast-brand">
-                By CodeCap Ventures
-              </div>
+            <div className="pc-links">
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a href="/services">
+                Services
+              </a>
+
+              <a href="/products">
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a
+                href="/podcast"
+                className="pc-active"
+              >
+                Podcast
+              </a>
+
             </div>
+
+            <button
+              className="pc-talk"
+              onClick={() =>
+                (window.location.href =
+                  "mailto:hello@codecap.ai")
+              }
+            >
+              Talk to us
+            </button>
+
+            <button
+              className="pc-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "×" : "☰"}
+            </button>
+
           </div>
 
-          <h1>
-            The
-            <br />
-            Build Brief.
-          </h1>
+          {menuOpen && (
+            <div className="pc-mobile-menu">
 
-          <p
-            style={{
-              fontSize: "1.1rem",
-              color: "#6b7a8d",
-              lineHeight: "1.8",
-              maxWidth: "560px",
-              fontFamily: "'Open Sans', sans-serif"
-            }}
-          >
-            A no-fluff podcast for founders and operators building in
-            Southeast Asia, the Gulf, and South Asia. Every episode is a
-            direct conversation with people who are in the room — building
-            companies, closing deals, raising capital, and navigating the
-            chaos of early-stage in high-growth markets.
-          </p>
+              <a href="/">Home</a>
 
-          <div className="podcast-platforms">
-            <div className="platform-btn">🎵 Spotify</div>
-            <div className="platform-btn">🎧 Apple Podcasts</div>
-            <div className="platform-btn">▶️ YouTube</div>
-            <div className="platform-btn">☁️ Pocket Casts</div>
-          </div>
-        </div>
-      </section>
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
 
-      {/* FORMAT */}
-      <section>
-        <div className="eyebrow reveal">Show Format</div>
+              <a href="/services">
+                Services
+              </a>
 
-        <h2 className="reveal">
-          Four episode types.
-          <br />
-          One through line: real talk.
-        </h2>
+              <a href="/products">
+                Products
+              </a>
 
-        <p className="section-lead reveal">
-          Every format is designed to give founders and operators something
-          they can actually use — not theory, not inspiration, but applicable
-          insight from people who've done it.
-        </p>
+              <a href="/portfolio">
+                Portfolio
+              </a>
 
-        <div className="format-grid reveal">
-          <div className="format-card">
-            <div className="format-icon">🏗️</div>
-            <h3>Founder Stories</h3>
-            <p>
-              Raw conversations with founders on what actually happened:
-              the pivots, the mis-hires, the breakthrough deals, the
-              near-death moments. No highlight reels. No PR polish. The full
-              story from someone who lived it.
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+              <a href="mailto:hello@codecap.ai">
+                Talk to us →
+              </a>
+
+            </div>
+          )}
+
+        </nav>
+
+        {/* HERO */}
+
+        <section className="pc-hero">
+
+          <div className="pc-grid"></div>
+
+          <div className="pc-glow pc-glow-one"></div>
+          <div className="pc-glow pc-glow-two"></div>
+
+          <div className="pc-hero-inner pc-reveal">
+
+            <div className="pc-eyebrow">
+              By CodeCap Ventures
+            </div>
+
+            <h1>
+              The
+              <br />
+              <span className="pc-gradient">
+                Build Brief.
+              </span>
+            </h1>
+
+            <p className="pc-hero-copy">
+              A no-fluff podcast for founders and
+              operators building in Southeast Asia,
+              the Gulf, and South Asia. Every episode
+              is a direct conversation with people who
+              are in the room — building companies,
+              closing deals, raising capital, and
+              navigating the chaos of early-stage in
+              high-growth markets.
             </p>
-          </div>
 
-          <div className="format-card">
-            <div className="format-icon">📊</div>
-            <h3>Market Intel</h3>
-            <p>
-              Short-form episodes on what's moving in SEA, Gulf, and India.
-              Sector-specific, data-grounded, and updated as conditions
-              change. What deals are getting done, what's getting passed,
-              and why.
-            </p>
-          </div>
-
-          <div className="format-card">
-            <div className="format-icon">⚙️</div>
-            <h3>The Operator's Playbook</h3>
-            <p>
-              Deep dives with GTM leaders, CISOs, and product builders on
-              craft and execution. How to run enterprise sales in the Gulf.
-              How to build a threat intelligence team from scratch.
-              Practical, specific, actionable.
-            </p>
-          </div>
-
-          <div className="format-card">
-            <div className="format-icon">💼</div>
-            <h3>VC Perspectives</h3>
-            <p>
-              Candid conversations with investors on what they're funding,
-              what they're passing on, and why. No talking points. We push
-              for specifics — sectors, stages, check sizes, and the mistakes
-              founders make in pitch meetings.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* EPISODES */}
-      <section style={{ background: "var(--surface)" }}>
-        <div className="eyebrow reveal">Episodes</div>
-
-        <h2 className="reveal">
-          Latest episodes.
-        </h2>
-
-        <div className="episode-list reveal">
-
-          <div className="episode-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <div className="ep-num">EP 05</div>
-              <div className="ep-play">▶</div>
+            <div className="pc-by">
+              Listen wherever you get your podcasts
             </div>
 
-            <div className="ep-meta">
-              <div className="ep-tag">
-                Founder Stories · India
+            <div className="pc-platforms">
+
+              <div className="pc-platform">
+                Spotify
               </div>
 
-              <div className="ep-title">
-                The India GTM Playbook: Why What Works in SG Fails in Mumbai
+              <div className="pc-platform">
+                Apple Podcasts
               </div>
 
-              <div className="ep-desc">
-                Market dynamics, deal cycles, relationship rules, and the
-                cultural blind spots that kill enterprise deals for foreign
-                founders entering India.
+              <div className="pc-platform">
+                YouTube
               </div>
+
+              <div className="pc-platform">
+                Pocket Casts
+              </div>
+
             </div>
 
-            <div className="ep-info">
-              <div className="ep-duration">48 min</div>
-              <div className="ep-date">April 2025</div>
-              <div className="ep-new">New</div>
-            </div>
           </div>
 
-          <div className="episode-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <div className="ep-num">EP 04</div>
-              <div className="ep-play">▶</div>
-            </div>
+        </section>
 
-            <div className="ep-meta">
-              <div className="ep-tag">
-                Market Intel · Gulf
+        {/* FORMAT */}
+
+        <section className="pc-section">
+
+          <div className="pc-container">
+
+            <div className="pc-reveal">
+
+              <div className="pc-label">
+                The Format
               </div>
 
-              <div className="ep-title">
-                Building a Startup in Singapore as a Foreign Founder
+              <h2 className="pc-title">
+                Four ways to
+                <br />
+                <span>get inside the room.</span>
+              </h2>
+
+            </div>
+
+            <div className="pc-format-grid">
+
+              {formats.map((format) => (
+                <div
+                  className="pc-format pc-reveal"
+                  key={format.number}
+                >
+
+                  <div className="pc-format-number">
+                    {format.number}
+                  </div>
+
+                  <h3>
+                    {format.title}
+                  </h3>
+
+                  <p>
+                    {format.text}
+                  </p>
+
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* EPISODES */}
+
+        <section className="pc-section">
+
+          <div className="pc-container">
+
+            <div className="pc-reveal">
+
+              <div className="pc-label">
+                Episodes
               </div>
 
-              <div className="ep-desc">
-                Entity setup, MOM passes, hiring local talent, navigating
-                government grants, and the things nobody tells you when you
-                land in Singapore to build a company.
-              </div>
+              <h2 className="pc-title">
+                Recent
+                <br />
+                <span>conversations.</span>
+              </h2>
+
             </div>
 
-            <div className="ep-info">
-              <div className="ep-duration">55 min</div>
-              <div className="ep-date">March 2025</div>
+            <div className="pc-episode-list">
+
+              {episodes.map((episode) => (
+                <article
+                  className="pc-episode pc-reveal"
+                  key={episode.episode}
+                >
+
+                  <div className="pc-episode-no">
+
+                    {episode.episode}
+
+                    {episode.status && (
+                      <span className="pc-new">
+                        {episode.status}
+                      </span>
+                    )}
+
+                  </div>
+
+                  <div>
+
+                    <h3>
+                      {episode.title}
+                    </h3>
+
+                    <p>
+                      {episode.description}
+                    </p>
+
+                  </div>
+
+                  <div className="pc-episode-meta">
+                    {episode.duration}
+                    <br />
+                    {episode.date}
+                  </div>
+
+                </article>
+              ))}
+
             </div>
+
           </div>
 
-          <div className="episode-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <div className="ep-num">EP 03</div>
-              <div className="ep-play">▶</div>
-            </div>
+        </section>
 
-            <div className="ep-meta">
-              <div className="ep-tag">
-                VC Perspectives
-              </div>
+        {/* GUEST WALL */}
 
-              <div className="ep-title">
-                Why We Passed on 40 Deals This Quarter
-              </div>
+        <section className="pc-section pc-guest-section">
 
-              <div className="ep-desc">
-                A CodeCap partner breaks down the patterns: what separates
-                the startups we back from the ones we decline, and the
-                mistakes founders make in the first five minutes of a pitch.
-              </div>
-            </div>
+          <div className="pc-container">
 
-            <div className="ep-info">
-              <div className="ep-duration">42 min</div>
-              <div className="ep-date">February 2025</div>
-            </div>
-          </div>
+            <div className="pc-reveal">
 
-          <div className="episode-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <div className="ep-num">EP 02</div>
-              <div className="ep-play">▶</div>
-            </div>
-
-            <div className="ep-meta">
-              <div className="ep-tag">
-                Operator's Playbook · Cybersecurity
-              </div>
-
-              <div className="ep-title">
-                AI Security in 2025: The Threat Landscape Is Changing Faster
-                Than the Products
+              <div className="pc-label">
+                Guest Wall
               </div>
 
-              <div className="ep-desc">
-                A CISO's take on the gap between enterprise security posture
-                and the actual threat environment in 2025. LLMs on both
-                sides of the attack surface — and what security teams are
-                doing about it.
-              </div>
+              <h2 className="pc-title">
+                Voices from
+                <br />
+                <span>the ecosystem.</span>
+              </h2>
+
             </div>
 
-            <div className="ep-info">
-              <div className="ep-duration">61 min</div>
-              <div className="ep-date">January 2025</div>
+            <div className="pc-guest-grid">
+
+              {guests.map((guest, index) => (
+                <div
+                  className="pc-guest pc-reveal"
+                  key={guest}
+                >
+                  <div>
+                    <div
+                      className="pc-guest-number"
+                    >
+                      0{index + 1}
+                    </div>
+
+                    {guest}
+                  </div>
+                </div>
+              ))}
+
             </div>
+
           </div>
 
-          <div className="episode-row">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <div className="ep-num">EP 01</div>
-              <div className="ep-play">▶</div>
-            </div>
+        </section>
 
-            <div className="ep-meta">
-              <div className="ep-tag">
-                Founder Stories · Gulf
-              </div>
+        {/* SUBSCRIBE */}
 
-              <div className="ep-title">
-                Zero to First Customer in the Gulf
-              </div>
+        <section className="pc-subscribe">
 
-              <div className="ep-desc">
-                How one founder closed an enterprise deal in Dubai before
-                the product was finished. The relationship-first sales
-                approach, navigating local partners, and what the Gulf deal
-                cycle actually looks like from the inside.
-              </div>
-            </div>
+          <div className="pc-subscribe-inner pc-reveal">
 
-            <div className="ep-info">
-              <div className="ep-duration">52 min</div>
-              <div className="ep-date">December 2024</div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* GUEST WALL */}
-      <section>
-        <div className="eyebrow reveal">
-          Voices on the Show
-        </div>
-
-        <h2 className="reveal">
-          Guests who've been in the room.
-        </h2>
-
-        <p className="section-lead reveal">
-          We bring on founders, operators, investors, and domain experts
-          from our network across SEA, Gulf, and South Asia. People who've
-          done what they're talking about.
-        </p>
-
-        <div className="guest-grid reveal">
-
-          <div className="guest-card">
-            <div className="guest-avatar">VC</div>
-            <div className="guest-name">VC Partners</div>
-            <div className="guest-role">
-              Across SEA, Gulf & India VC funds
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">CI</div>
-            <div className="guest-name">CISOs</div>
-            <div className="guest-role">
-              Enterprise security leaders, FinServ & Gov
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">FD</div>
-            <div className="guest-name">Founders</div>
-            <div className="guest-role">
-              Pre-seed to Series B, across our core markets
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">GP</div>
-            <div className="guest-name">GTM Operators</div>
-            <div className="guest-role">
-              Sales leaders & revenue builders in high-velocity markets
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">AI</div>
-            <div className="guest-name">AI Engineers</div>
-            <div className="guest-role">
-              LLM builders, ML practitioners, AI security researchers
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">RG</div>
-            <div className="guest-name">Regulatory Experts</div>
-            <div className="guest-role">
-              MAS, DIFC/ADGM, and SEBI specialists
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">LG</div>
-            <div className="guest-name">Legal & Structuring</div>
-            <div className="guest-role">
-              Startup lawyers and deal structuring specialists
-            </div>
-          </div>
-
-          <div className="guest-card">
-            <div className="guest-avatar">CC</div>
-            <div className="guest-name">CodeCap Team</div>
-            <div className="guest-role">
-              Hosted by and featuring CodeCap partners
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* SUBSCRIBE */}
-      <section style={{ background: "var(--surface)" }}>
-        <div className="sub-strip reveal">
-
-          <div>
-            <div className="eyebrow">
-              Never Miss an Episode
+            <div className="pc-label">
+              Subscribe
             </div>
 
             <h2>
-              Subscribe wherever
+              Never Miss
               <br />
-              you listen.
+              an Episode.
             </h2>
 
-            <p
-              style={{
-                color: "var(--muted)",
-                fontSize: "0.95rem",
-                lineHeight: "1.8",
-                marginTop: "1rem",
-                maxWidth: "400px",
-                fontFamily: "'Open Sans', sans-serif"
-              }}
-            >
-              New episodes drop bi-weekly. Follow the show to get notified
-              when new conversations go live — or sign up for the Insights
-              newsletter to get episode summaries by email.
+            <p>
+              Follow The Build Brief wherever you listen
+              to podcasts. New conversations with founders,
+              operators, investors and technology leaders.
             </p>
 
-            <a
-              href="/insights"
-              className="btn-ghost"
-              style={{
-                marginTop: "1.5rem",
-                display: "inline-block"
-              }}
-            >
-              Get the newsletter →
-            </a>
-          </div>
+            <div className="pc-sub-links">
 
-          <div className="sub-links">
+              <a
+                href="#"
+                className="pc-sub-link"
+              >
+                Spotify
+              </a>
 
-            <div className="sub-link">
-              <div className="sub-link-icon">🎵</div>
-              <div>
-                <div className="sub-link-text">Spotify</div>
-                <div className="sub-link-sub">
-                  Follow on Spotify
-                </div>
-              </div>
+              <a
+                href="#"
+                className="pc-sub-link"
+              >
+                Apple Podcasts
+              </a>
+
+              <a
+                href="#"
+                className="pc-sub-link"
+              >
+                YouTube
+              </a>
+
+              <a
+                href="#"
+                className="pc-sub-link"
+              >
+                RSS Feed
+              </a>
+
             </div>
 
-            <div className="sub-link">
-              <div className="sub-link-icon">🎧</div>
-              <div>
-                <div className="sub-link-text">Apple Podcasts</div>
-                <div className="sub-link-sub">
-                  Subscribe & leave a review
-                </div>
-              </div>
-            </div>
+            <div className="pc-guest-cta">
 
-            <div className="sub-link">
-              <div className="sub-link-icon">▶️</div>
-              <div>
-                <div className="sub-link-text">YouTube</div>
-                <div className="sub-link-sub">
-                  Full video episodes + clips
-                </div>
-              </div>
-            </div>
+              <h3>
+                Want to be a guest?
+              </h3>
 
-            <div className="sub-link">
-              <div className="sub-link-icon">📻</div>
-              <div>
-                <div className="sub-link-text">RSS Feed</div>
-                <div className="sub-link-sub">
-                  Add to any podcast app
-                </div>
-              </div>
+              <p>
+                Building, operating or investing in the
+                markets we cover? Pitch a guest.
+              </p>
+
+              <a
+                href="mailto:podcast@codecap.ai"
+                className="pc-guest-button"
+              >
+                Pitch a Guest →
+              </a>
+
             </div>
 
           </div>
-        </div>
-      </section>
 
-      {/* GUEST PITCH */}
-      <section
-        style={{
-          textAlign: "center",
-          borderTop: "1px solid var(--border)",
-          padding: "6rem 4rem"
-        }}
-      >
-        <div
-          className="eyebrow"
-          style={{ justifyContent: "center" }}
-        >
-          Guest Applications
-        </div>
+        </section>
 
-        <h2
-          style={{
-            maxWidth: "600px",
-            margin: "0 auto 1.25rem",
-            fontFamily: "'Raleway', sans-serif",
-            fontWeight: 800
-          }}
-        >
-          Want to be a guest
-          <br />
-          on The Build Brief?
-        </h2>
+        {/* FOOTER */}
 
-        <p
-          style={{
-            color: "var(--muted)",
-            maxWidth: "500px",
-            margin: "0 auto 2.5rem",
-            fontFamily: "'Open Sans', sans-serif"
-          }}
-        >
-          We're always looking for founders, operators, and investors with
-          genuine insight and real stories from the markets we cover. If
-          that's you — or someone you know — reach out.
-        </p>
+        <footer className="pc-footer">
 
-        <a
-          href="mailto:podcast@codecap.ai"
-          className="btn-primary"
-        >
-          Pitch a Guest
-        </a>
+          <div className="pc-footer-inner">
 
-        <p
-          style={{
-            fontSize: "0.8rem",
-            color: "var(--muted)",
-            marginTop: "1.5rem"
-          }}
-        >
-          podcast@codecap.ai
-        </p>
-      </section>
+            <div className="pc-footer-logo">
+              Code<span>Cap</span>
+            </div>
 
-      {/* FOOTER */}
-      <footer>
-        <div className="f-in">
+            <div className="pc-footer-text">
+              © 2025 CodeCap Ventures · Singapore · UAE · India
+              <br />
+              hello@codecap.ai
+            </div>
 
-          <div className="f-brand">
-            Code<span>Cap</span>
           </div>
 
-          <div className="f-links">
-            <a href="/venture-studio">Venture Studio</a>
-            <a href="/products">Products</a>
-            <a href="/portfolio">Portfolio</a>
-            <a href="/team">Team</a>
-            <a href="/insights">Insights</a>
-            <a href="/podcast">Podcast</a>
-          </div>
+        </footer>
 
-          <div className="f-meta">
-            © 2025 CodeCap Ventures · Singapore · UAE · India · hello@codecap.ai
-          </div>
-
-        </div>
-      </footer>
+      </div>
     </>
   );
 }

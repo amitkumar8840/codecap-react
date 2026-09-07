@@ -14,20 +14,20 @@ const path = window.location.pathname.toLowerCase();
 
 let Page = App;
 
-if (path === "/insights") {
+if (path === "/venture-studio") {
+  Page = VentureStudio;
+} else if (path === "/services") {
+  Page = Services;
+} else if (path === "/products") {
+  Page = Products;
+} else if (path === "/portfolio") {
+  Page = Portfolio;
+} else if (path === "/team") {
+  Page = Team;
+} else if (path === "/insights") {
   Page = Insights;
 } else if (path === "/podcast") {
   Page = Podcast;
-} else if (path === "/portfolio") {
-  Page = Portfolio;
-} else if (path === "/products") {
-  Page = Products;
-} else if (path === "/services") {
-  Page = Services;
-} else if (path === "/team") {
-  Page = Team;
-} else if (path === "/venture-studio") {
-  Page = VentureStudio;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(

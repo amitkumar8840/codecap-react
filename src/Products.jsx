@@ -1,1232 +1,1900 @@
-import "./styles.css";
+import React, { useEffect, useState } from "react";
 
 function Products() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeProduct, setActiveProduct] = useState(0);
+
+  useEffect(() => {
+    const reveals = document.querySelectorAll(".pd-reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("pd-visible");
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    reveals.forEach((item) => observer.observe(item));
+
+    const cards = document.querySelectorAll(".pd-tilt");
+
+    const moveCard = (e) => {
+      const card = e.currentTarget;
+      const rect = card.getBoundingClientRect();
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const rotateX =
+        ((y - rect.height / 2) / rect.height) * -6;
+
+      const rotateY =
+        ((x - rect.width / 2) / rect.width) * 6;
+
+      card.style.transform = `
+        perspective(1000px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-8px)
+      `;
+    };
+
+    const resetCard = (e) => {
+      e.currentTarget.style.transform =
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("mousemove", moveCard);
+      card.addEventListener("mouseleave", resetCard);
+    });
+
+    return () => {
+      observer.disconnect();
+
+      cards.forEach((card) => {
+        card.removeEventListener("mousemove", moveCard);
+        card.removeEventListener("mouseleave", resetCard);
+      });
+    };
+  }, []);
+
+  const products = [
+    {
+      name: "Abhra",
+      status: "Available Now",
+      category: "Sovereign Cloud Security",
+      description:
+        "Sovereign cloud security for the regulated economy.",
+      fullDescription:
+        "Abhra provides universal-inventory scanning across AWS, Azure and GCP, mapped to 25 compliance frameworks. It is desktop-first and scan data never leaves the machine.",
+      checks: "1,894+",
+      frameworks: "25",
+      clouds: "AWS · Azure · GCP",
+      button: "Download Abhra",
+      link: "https://abhra.world/download"
+    },
+    {
+      name: "ILCM",
+      status: "In Development",
+      category: "Intelligent Security",
+      description:
+        "A CodeCap product in development.",
+      fullDescription:
+        "ILCM is in development as part of CodeCap's product portfolio, focused on intelligent automation and enterprise security operations.",
+      checks: "Early",
+      frameworks: "Access",
+      clouds: "Enterprise",
+      button: "Join Early Access",
+      link: "mailto:products@codecap.ai"
+    }
+  ];
+
   return (
     <>
       <style>{`
-        .products-page {
-          width: 100%;
-          color: #111;
-          background: #fff;
-          font-family: "Open Sans", sans-serif;
+
+        * {
+          box-sizing: border-box;
+        }
+
+        html {
+          scroll-behavior: smooth;
+        }
+
+        body {
+          margin: 0;
+          background: #08090d;
+          color: #fff;
+          font-family: "Open Sans", Arial, sans-serif;
+        }
+
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        button {
+          font-family: inherit;
+        }
+
+        .pd-page {
+          min-height: 100vh;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 10% 15%,
+              rgba(240,25,101,.12),
+              transparent 28%
+            ),
+            radial-gradient(
+              circle at 90% 25%,
+              rgba(2,159,231,.12),
+              transparent 28%
+            ),
+            #08090d;
         }
 
         /* NAVBAR */
-        .products-page nav {
-          position: sticky;
-          top: 0;
-          z-index: 200;
-          background: rgba(255,255,255,.97);
-          backdrop-filter: blur(14px);
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 1px 16px rgba(0,0,0,.06);
+
+        .pd-nav {
+          position: fixed;
+          z-index: 1000;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(1180px, calc(100% - 32px));
+          padding: 14px 18px;
+          border-radius: 22px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(10,11,17,.76);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.3);
         }
 
-        .products-page .nav-in {
-          max-width: 1140px;
-          margin: 0 auto;
-          padding: 0 2rem;
+        .pd-nav-inner {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          height: 68px;
+          gap: 20px;
         }
 
-        .products-page .logo {
-          font-family: "Raleway", sans-serif;
-          font-size: 1.35rem;
+        .pd-logo {
+          font-size: 25px;
           font-weight: 900;
-          color: #111;
-          letter-spacing: -.02em;
-          text-decoration: none;
+          letter-spacing: -1.5px;
         }
 
-        .products-page .logo span {
+        .pd-logo span {
           color: #f01965;
         }
 
-        .products-page .nav-links {
+        .pd-links {
           display: flex;
-          gap: .15rem;
-          list-style: none;
-          margin: 0;
-          padding: 0;
+          align-items: center;
+          gap: 21px;
         }
 
-        .products-page .nav-links a {
-          font-size: .78rem;
-          font-weight: 600;
-          color: #444;
-          padding: .45rem .8rem;
-          border-radius: 5px;
-          text-decoration: none;
-          transition: color .2s, background .2s;
-        }
-
-        .products-page .nav-links a:hover {
-          color: #f01965;
-          background: rgba(240,25,101,.06);
-        }
-
-        .products-page .btn-talk {
-          font-family: "Open Sans", sans-serif;
-          font-size: .78rem;
+        .pd-links a {
+          color: rgba(255,255,255,.7);
+          font-size: 13px;
           font-weight: 700;
-          padding: .55rem 1.4rem;
-          background: #111;
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: background .2s;
+          transition: .25s ease;
         }
 
-        .products-page .btn-talk:hover {
-          background: #f01965;
+        .pd-links a:hover,
+        .pd-active {
+          color: #fff !important;
+        }
+
+        .pd-talk {
+          border: 0;
+          padding: 13px 20px;
+          border-radius: 13px;
+          background: linear-gradient(
+            135deg,
+            #f01965,
+            #b70b6d
+          );
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 10px 30px rgba(240,25,101,.25);
+        }
+
+        .pd-menu {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.05);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
         }
 
         /* HERO */
-        .products-page .page-hero {
-          width: 100%;
-          padding: 105px max(55px, calc((100% - 1140px) / 2));
-          background: linear-gradient(135deg, #fff5f8 0%, #f0f8ff 100%);
+
+        .pd-hero {
+          min-height: 100vh;
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding: 155px 7vw 100px;
+          overflow: hidden;
         }
 
-        .products-page .eyebrow-text {
-          font-size: .72rem;
+        .pd-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            );
+          background-size: 60px 60px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent
+          );
+        }
+
+        .pd-glow {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          border-radius: 50%;
+          filter: blur(110px);
+          opacity: .23;
+        }
+
+        .pd-glow-one {
+          left: -180px;
+          top: 70px;
+          background: #f01965;
+          animation: pdGlow 8s ease-in-out infinite alternate;
+        }
+
+        .pd-glow-two {
+          right: -180px;
+          bottom: -50px;
+          background: #029fe7;
+          animation: pdGlow 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes pdGlow {
+          to {
+            transform: translate(80px,-40px) scale(1.2);
+          }
+        }
+
+        .pd-hero-inner {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 1240px;
+          margin: auto;
+          display: grid;
+          grid-template-columns: 1.05fr .95fr;
+          gap: 70px;
+          align-items: center;
+        }
+
+        .pd-label {
+          display: inline-flex;
+          padding: 8px 13px;
+          border: 1px solid rgba(255,255,255,.13);
+          border-radius: 100px;
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.68);
+          font-size: 11px;
+          font-weight: 900;
           letter-spacing: .14em;
           text-transform: uppercase;
-          color: #6b7a8d;
-          margin-bottom: 1rem;
-          font-weight: 600;
         }
 
-        .products-page .divider {
-          width: 52px;
-          height: 4px;
-          background: #f01965;
-          border-radius: 3px;
-          margin-bottom: 1.8rem;
-        }
-
-        .products-page .page-hero h1 {
-          font-family: "Raleway", sans-serif;
-          font-size: clamp(3rem, 5.5vw, 4.8rem);
+        .pd-hero h1 {
+          margin: 25px 0 0;
+          font-size: clamp(52px, 7vw, 96px);
+          line-height: .92;
+          letter-spacing: -5px;
           font-weight: 900;
-          line-height: 1.05;
-          letter-spacing: -.025em;
-          color: #f01965;
-          margin: 0 0 1.2rem;
         }
 
-        .products-page .page-hero p {
-          font-size: 1rem;
-          color: #6b7a8d;
-          max-width: 560px;
-          line-height: 1.82;
-          margin: 0;
-          font-weight: 300;
+        .pd-gradient {
+          background:
+            linear-gradient(
+              100deg,
+              #f01965,
+              #ff4f8c,
+              #029fe7
+            );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: pdGradient 5s linear infinite;
         }
 
-        /* SECTIONS */
-        .products-page section {
-          max-width: 1140px;
-          margin: 0 auto;
-          padding: 70px 2rem;
+        @keyframes pdGradient {
+          to {
+            background-position: 200% center;
+          }
         }
 
-        .products-page section h2 {
-          font-family: "Raleway", sans-serif;
-          font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+        .pd-hero-copy {
+          max-width: 680px;
+          margin-top: 30px;
+          color: rgba(255,255,255,.61);
+          font-size: 16px;
+          line-height: 1.85;
+        }
+
+        .pd-actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-top: 33px;
+        }
+
+        .pd-primary,
+        .pd-secondary {
+          padding: 15px 22px;
+          border-radius: 14px;
           font-weight: 800;
-          line-height: 1.2;
-          color: #111;
-          margin-bottom: 1rem;
+          transition: .3s ease;
         }
 
-        .products-page section h3 {
-          font-family: "Raleway", sans-serif;
-          color: #111;
+        .pd-primary {
+          color: #08090d;
+          background: #fff;
         }
 
-        .products-page .accent {
-          color: #f01965;
+        .pd-secondary {
+          color: #fff;
+          border: 1px solid rgba(255,255,255,.15);
+          background: rgba(255,255,255,.04);
         }
 
-        .products-page .lead {
-          font-size: .95rem;
-          color: #6b7a8d;
-          line-height: 1.82;
+        .pd-primary:hover,
+        .pd-secondary:hover {
+          transform: translateY(-4px);
         }
 
-        /* ABHRA */
-        .products-page .abhra-block {
-          background: linear-gradient(135deg,#fff5f8,#f0f8ff);
-          border: 2px solid #fbeaf0;
+        /* 3D PRODUCT */
+
+        .pd-visual {
+          min-height: 520px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          perspective: 1200px;
+        }
+
+        .pd-orbit {
+          position: absolute;
+          width: 410px;
+          height: 410px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,.1);
+          transform: rotateX(65deg);
+          animation: pdOrbit 12s linear infinite;
+        }
+
+        .pd-orbit::before,
+        .pd-orbit::after {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+        }
+
+        .pd-orbit::before {
+          top: 35px;
+          left: 55px;
+          background: #f01965;
+          box-shadow: 0 0 25px #f01965;
+        }
+
+        .pd-orbit::after {
+          bottom: 35px;
+          right: 55px;
+          background: #029fe7;
+          box-shadow: 0 0 25px #029fe7;
+        }
+
+        @keyframes pdOrbit {
+          to {
+            transform:
+              rotateX(65deg)
+              rotateZ(360deg);
+          }
+        }
+
+        .pd-device {
+          position: relative;
+          width: 355px;
+          min-height: 365px;
+          padding: 25px;
+          border-radius: 28px;
+          border: 1px solid rgba(255,255,255,.16);
+          background:
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.11),
+              rgba(255,255,255,.025)
+            );
+          backdrop-filter: blur(18px);
+          box-shadow:
+            0 50px 100px rgba(0,0,0,.55),
+            inset 0 1px 0 rgba(255,255,255,.1);
+          transform:
+            rotateX(10deg)
+            rotateY(-13deg);
+          animation: pdDevice 5s ease-in-out infinite;
+        }
+
+        @keyframes pdDevice {
+          50% {
+            transform:
+              translateY(-16px)
+              rotateX(14deg)
+              rotateY(-18deg);
+          }
+        }
+
+        .pd-window {
+          display: flex;
+          gap: 6px;
+        }
+
+        .pd-window span {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(255,255,255,.25);
+        }
+
+        .pd-device-label {
+          margin-top: 30px;
+          color: rgba(255,255,255,.42);
+          font-size: 10px;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+        }
+
+        .pd-device-name {
+          margin-top: 8px;
+          font-size: 34px;
+          font-weight: 900;
+        }
+
+        .pd-device-status {
+          display: inline-flex;
+          margin-top: 12px;
+          padding: 7px 10px;
+          border-radius: 100px;
+          background: rgba(240,25,101,.12);
+          color: #ff4b88;
+          font-size: 9px;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .pd-device-grid {
+          margin-top: 30px;
+          display: grid;
+          grid-template-columns: repeat(3,1fr);
+          gap: 8px;
+        }
+
+        .pd-device-box {
+          height: 62px;
           border-radius: 12px;
-          padding: 2.75rem;
-          margin-bottom: 2rem;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.04);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 9px;
+        }
+
+        .pd-device-box strong {
+          font-size: 15px;
+        }
+
+        .pd-device-box small {
+          color: rgba(255,255,255,.4);
+          font-size: 8px;
+          margin-top: 3px;
+        }
+
+        .pd-floating {
+          position: absolute;
+          padding: 14px 17px;
+          border-radius: 17px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(255,255,255,.07);
+          backdrop-filter: blur(15px);
+          box-shadow: 0 25px 55px rgba(0,0,0,.35);
+          animation: pdFloat 5s ease-in-out infinite;
+        }
+
+        .pd-floating strong {
+          display: block;
+          font-size: 17px;
+        }
+
+        .pd-floating small {
+          color: rgba(255,255,255,.45);
+        }
+
+        .pd-floating-one {
+          top: 50px;
+          right: 0;
+        }
+
+        .pd-floating-two {
+          left: 0;
+          bottom: 70px;
+          animation-delay: -2s;
+        }
+
+        .pd-floating-three {
+          right: 20px;
+          bottom: 15px;
+          animation-delay: -3s;
+        }
+
+        @keyframes pdFloat {
+          50% {
+            transform: translateY(-17px) rotateZ(2deg);
+          }
+        }
+
+        /* COMMON */
+
+        .pd-section {
+          padding: 125px 7vw;
+        }
+
+        .pd-container {
+          max-width: 1180px;
+          margin: auto;
+        }
+
+        .pd-section-label {
+          color: #f01965;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+          margin-bottom: 17px;
+        }
+
+        .pd-title {
+          margin: 0;
+          font-size: clamp(42px,5vw,73px);
+          line-height: .98;
+          letter-spacing: -3px;
+        }
+
+        .pd-title span {
+          color: rgba(255,255,255,.3);
+        }
+
+        /* PRODUCT SELECTOR */
+
+        .pd-selector {
+          margin-top: 65px;
+          display: grid;
+          grid-template-columns: .65fr 1.35fr;
+          gap: 22px;
+        }
+
+        .pd-tabs {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .pd-tab {
+          border: 1px solid rgba(255,255,255,.09);
+          border-radius: 17px;
+          background: rgba(255,255,255,.035);
+          color: rgba(255,255,255,.58);
+          padding: 20px;
+          text-align: left;
+          cursor: pointer;
+          transition: .35s ease;
+        }
+
+        .pd-tab:hover {
+          transform: translateX(5px);
+          color: #fff;
+        }
+
+        .pd-tab.active {
+          transform: translateX(8px);
+          color: #fff;
+          border-color: rgba(240,25,101,.45);
+          background:
+            linear-gradient(
+              100deg,
+              rgba(240,25,101,.14),
+              rgba(2,159,231,.07)
+            );
+        }
+
+        .pd-tab-number {
+          display: block;
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
+          margin-bottom: 12px;
+        }
+
+        .pd-tab-name {
+          font-size: 19px;
+          font-weight: 900;
+        }
+
+        .pd-tab-status {
+          display: block;
+          margin-top: 8px;
+          color: rgba(255,255,255,.38);
+          font-size: 10px;
+        }
+
+        .pd-detail {
+          min-height: 500px;
+          padding: 38px;
+          border-radius: 30px;
+          border: 1px solid rgba(255,255,255,.1);
+          background:
+            radial-gradient(
+              circle at 90% 10%,
+              rgba(240,25,101,.15),
+              transparent 28%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.07),
+              rgba(255,255,255,.025)
+            );
           position: relative;
           overflow: hidden;
         }
 
-        .products-page .abhra-block::before {
-          content: "FLAGSHIP PRODUCT";
+        .pd-detail::after {
+          content: "";
           position: absolute;
-          top: 0;
-          right: 2rem;
-          font-family: "Open Sans", sans-serif;
-          font-size: .55rem;
-          font-weight: 700;
-          letter-spacing: .1em;
-          background: #f01965;
-          color: #fff;
-          padding: .2rem .7rem;
-          border-radius: 0 0 6px 6px;
+          width: 240px;
+          height: 240px;
+          right: -100px;
+          bottom: -100px;
+          border-radius: 50%;
+          background: #029fe7;
+          filter: blur(70px);
+          opacity: .12;
         }
 
-        .products-page .abhra-wm {
+        .pd-detail-top {
           display: flex;
+          justify-content: space-between;
+          gap: 15px;
           align-items: center;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
         }
 
-        .products-page .abhra-ic {
-          width: 48px;
-          height: 48px;
-          background: linear-gradient(135deg,#fff,#fbeaf0);
-          border-radius: 10px;
+        .pd-detail-category {
+          color: #029fe7;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .pd-detail-status {
+          padding: 7px 10px;
+          border-radius: 100px;
+          background: rgba(240,25,101,.1);
+          color: #ff4c89;
+          font-size: 9px;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .pd-detail h3 {
+          margin: 35px 0 12px;
+          font-size: clamp(38px,5vw,65px);
+          line-height: .9;
+          letter-spacing: -3px;
+        }
+
+        .pd-detail-description {
+          color: #f01965;
+          font-size: 14px;
+          font-weight: 800;
+        }
+
+        .pd-detail-text {
+          max-width: 720px;
+          color: rgba(255,255,255,.55);
+          line-height: 1.8;
+          margin-top: 23px;
+        }
+
+        .pd-stats {
+          margin-top: 30px;
+          display: grid;
+          grid-template-columns: repeat(3,1fr);
+          gap: 10px;
+        }
+
+        .pd-stat {
+          padding: 16px;
+          border-radius: 15px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .pd-stat strong {
+          display: block;
+          font-size: 20px;
+        }
+
+        .pd-stat small {
+          display: block;
+          margin-top: 5px;
+          color: rgba(255,255,255,.4);
+          font-size: 9px;
+          text-transform: uppercase;
+        }
+
+        .pd-detail-button {
+          display: inline-flex;
+          margin-top: 30px;
+          padding: 14px 19px;
+          border-radius: 13px;
+          background: #fff;
+          color: #08090d;
+          font-weight: 900;
+          font-size: 12px;
+          transition: .3s ease;
+        }
+
+        .pd-detail-button:hover {
+          transform: translateY(-4px);
+        }
+
+        /* ABHRA */
+
+        .pd-feature {
+          background: #f4f5f7;
+          color: #090a0e;
+        }
+
+        .pd-feature .pd-title span {
+          color: #747983;
+        }
+
+        .pd-feature-grid {
+          margin-top: 65px;
+          display: grid;
+          grid-template-columns: 1.05fr .95fr;
+          gap: 25px;
+          align-items: stretch;
+        }
+
+        .pd-feature-card {
+          min-height: 450px;
+          padding: 38px;
+          border-radius: 30px;
+          background: #fff;
+          border: 1px solid #e0e3e8;
+          position: relative;
+          overflow: hidden;
+          transition: .4s ease;
+        }
+
+        .pd-feature-card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 35px 80px rgba(0,0,0,.1);
+        }
+
+        .pd-feature-card::after {
+          content: "";
+          position: absolute;
+          width: 250px;
+          height: 250px;
+          border-radius: 50%;
+          right: -100px;
+          top: -100px;
+          background: #f01965;
+          filter: blur(55px);
+          opacity: .1;
+        }
+
+        .pd-feature-tag {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 100px;
+          background: rgba(240,25,101,.08);
+          color: #f01965;
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+        }
+
+        .pd-feature-card h3 {
+          margin: 65px 0 15px;
+          font-size: 50px;
+          letter-spacing: -3px;
+        }
+
+        .pd-feature-card p {
+          color: #6e7580;
+          line-height: 1.8;
+        }
+
+        .pd-feature-link {
+          display: inline-flex;
+          margin-top: 25px;
+          color: #f01965;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .pd-feature-visual {
+          min-height: 450px;
+          border-radius: 30px;
+          background:
+            linear-gradient(
+              145deg,
+              #11141c,
+              #08090d
+            );
+          border: 1px solid rgba(255,255,255,.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.3rem;
-          box-shadow: 0 4px 14px rgba(240,25,101,.2);
-        }
-
-        /* PRODUCT CARDS */
-        .products-page .prod-card {
-          background: #fff;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          padding: 2.5rem;
-          display: grid;
-          grid-template-columns: minmax(0,1fr) 280px;
-          gap: 2.5rem;
-          align-items: start;
-          margin-bottom: 2.5rem;
-          box-shadow: 0 5px 24px rgba(0,0,0,.06);
-        }
-
-        .products-page .prod-card.featured {
-          border-top: 3px solid #f01965;
-        }
-
-        .products-page .tag {
-          display: inline-block;
-          font-size: .68rem;
-          font-weight: 700;
-          padding: .25rem .65rem;
-          border-radius: 20px;
-          text-transform: uppercase;
-          letter-spacing: .06em;
-        }
-
-        .products-page .tag-pink {
-          background: #fbeaf0;
-          color: #f01965;
-        }
-
-        .products-page .tag-blue {
-          background: #e7f5fc;
-          color: #0288c7;
-        }
-
-        .products-page .tag-green {
-          background: #e3f6ec;
-          color: #1d9e75;
-        }
-
-        .products-page .pname {
-          font-family: "Raleway", sans-serif;
-          font-size: 1.8rem;
-          font-weight: 800;
-          color: #111;
-          margin: .5rem 0 .4rem;
-        }
-
-        .products-page .ptag {
-          font-size: .78rem;
-          font-weight: 600;
-          color: #1a1a2e;
-          line-height: 1.6;
-          margin-bottom: 1rem;
-        }
-
-        .products-page .ptag a {
-          color: #029fe7;
-        }
-
-        .products-page .pdesc {
-          font-size: .9rem;
-          color: #6b7a8d;
-          line-height: 1.8;
-          margin-bottom: 1rem;
-        }
-
-        .products-page .pfeats {
-          display: grid;
-          gap: .45rem;
-        }
-
-        .products-page .pf {
-          font-size: .82rem;
-          color: #1a1a2e;
-          line-height: 1.6;
-          padding-left: 15px;
           position: relative;
+          overflow: hidden;
+          perspective: 1000px;
         }
 
-        .products-page .pf::before {
-          content: "›";
-          position: absolute;
-          left: 0;
-          color: #f01965;
-          font-weight: 800;
-        }
-
-        /* SIDE BOXES */
-        .products-page .pasides {
-          display: grid;
-          gap: 1rem;
-        }
-
-        .products-page .pa {
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 1rem;
-          background: #fff;
-        }
-
-        .products-page .pal {
-          font-size: .68rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: .08em;
-          color: #6b7a8d;
-          margin-bottom: .55rem;
-        }
-
-        .products-page .pat {
-          display: inline-block;
-          font-size: .78rem;
-          color: #1a1a2e;
-          margin: 0 8px 5px 0;
-        }
-
-        /* STATUS */
-        .products-page .status-live {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          font-size: .68rem;
-          font-weight: 700;
-          color: #1d9e75;
-          background: #e3f6ec;
-          padding: .25rem .65rem;
-          border-radius: 20px;
-        }
-
-        .products-page .status-dev {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          font-size: .68rem;
-          font-weight: 700;
-          color: #f01965;
-          background: #fbeaf0;
-          padding: .25rem .65rem;
-          border-radius: 20px;
-        }
-
-        .products-page .sdot {
-          width: 6px;
-          height: 6px;
+        .pd-security-sphere {
+          width: 230px;
+          height: 230px;
           border-radius: 50%;
-          background: #1d9e75;
-        }
-
-        .products-page .sdot.d {
-          background: #f01965;
-        }
-
-        /* STATS */
-        .products-page .stats-strip {
-          display: flex;
-          gap: 2.5rem;
-          flex-wrap: wrap;
-          background: #f7f9fc;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 1.5rem 2rem;
-          margin: 1.5rem 0;
-        }
-
-        .products-page .stat-n {
-          font-family: "Raleway", sans-serif;
-          font-size: 1.8rem;
-          font-weight: 900;
-          color: #f01965;
-          line-height: 1;
-        }
-
-        .products-page .stat-l {
-          font-size: .68rem;
-          font-weight: 600;
-          letter-spacing: .08em;
-          text-transform: uppercase;
-          color: #6b7a8d;
-          margin-top: .2rem;
-        }
-
-        /* FRAMEWORKS */
-        .products-page .fw5 {
+          background:
+            radial-gradient(
+              circle at 30% 25%,
+              rgba(255,255,255,.2),
+              transparent 25%
+            ),
+            linear-gradient(
+              135deg,
+              #f01965,
+              #029fe7
+            );
+          box-shadow:
+            0 0 100px rgba(240,25,101,.2),
+            0 40px 80px rgba(0,0,0,.5);
+          animation: pdSphere 5s ease-in-out infinite;
           display: grid;
-          grid-template-columns: repeat(5,1fr);
-          gap: 1rem;
-          margin-top: 1.5rem;
+          place-items: center;
         }
 
-        .products-page .fw-item {
-          background: #fff;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          padding: 1rem;
-          text-align: center;
+        .pd-security-sphere::before {
+          content: "";
+          width: 165px;
+          height: 165px;
+          border-radius: 50%;
+          background: #0b0d12;
+          border: 1px solid rgba(255,255,255,.1);
         }
 
-        .products-page .fw-title {
-          font-family: "Open Sans", sans-serif;
-          font-size: .6rem;
-          font-weight: 700;
-          letter-spacing: .1em;
-          text-transform: uppercase;
-          color: #f01965;
-          margin-bottom: .45rem;
+        .pd-security-sphere::after {
+          content: "ABHRA";
+          position: absolute;
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: -1px;
         }
 
-        .products-page .fw-item p {
-          font-size: .7rem;
-          color: #6b7a8d;
-          line-height: 1.55;
+        @keyframes pdSphere {
+          50% {
+            transform:
+              translateY(-18px)
+              rotateY(180deg)
+              rotateX(8deg);
+          }
+        }
+
+        .pd-feature-chip {
+          position: absolute;
+          padding: 11px 13px;
+          border-radius: 13px;
+          background: rgba(255,255,255,.07);
+          border: 1px solid rgba(255,255,255,.1);
+          backdrop-filter: blur(12px);
+          color: rgba(255,255,255,.65);
+          font-size: 9px;
+          font-weight: 800;
+          animation: pdChip 4s ease-in-out infinite;
+        }
+
+        .pd-chip-one {
+          top: 55px;
+          left: 35px;
+        }
+
+        .pd-chip-two {
+          top: 90px;
+          right: 30px;
+          animation-delay: -1s;
+        }
+
+        .pd-chip-three {
+          bottom: 65px;
+          left: 50px;
+          animation-delay: -2s;
+        }
+
+        .pd-chip-four {
+          bottom: 35px;
+          right: 45px;
+          animation-delay: -3s;
+        }
+
+        @keyframes pdChip {
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        /* FEATURES */
+
+        .pd-feature-list {
+          margin-top: 65px;
+          display: grid;
+          grid-template-columns: repeat(2,1fr);
+          gap: 15px;
+        }
+
+        .pd-feature-item {
+          padding: 25px;
+          border-radius: 21px;
+          border: 1px solid rgba(255,255,255,.09);
+          background: rgba(255,255,255,.035);
+          transition: .35s ease;
+        }
+
+        .pd-feature-item:hover {
+          transform: translateY(-7px);
+          border-color: rgba(2,159,231,.4);
+        }
+
+        .pd-feature-item-number {
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .pd-feature-item h3 {
+          margin: 30px 0 10px;
+          font-size: 19px;
+        }
+
+        .pd-feature-item p {
+          margin: 0;
+          color: rgba(255,255,255,.45);
+          line-height: 1.7;
+          font-size: 13px;
         }
 
         /* CTA */
-        .products-page .cta-sec {
-          max-width: none;
-          background: #f7f9fc;
+
+        .pd-cta {
+          padding: 150px 7vw;
           text-align: center;
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(240,25,101,.15),
+              transparent 40%
+            );
         }
 
-        .products-page .cta-sec > div {
-          max-width: 580px;
-          margin: 0 auto;
+        .pd-cta h2 {
+          max-width: 900px;
+          margin: auto;
+          font-size: clamp(48px,7vw,92px);
+          line-height: .94;
+          letter-spacing: -5px;
         }
 
-        .products-page .cta-sec h2 {
-          margin-bottom: 1rem;
-        }
-
-        .products-page .cta-sec p {
-          color: #6b7a8d;
+        .pd-cta p {
+          max-width: 650px;
+          margin: 28px auto 35px;
+          color: rgba(255,255,255,.5);
           line-height: 1.8;
         }
 
-        .products-page .cta-acts {
-          display: flex;
-          justify-content: center;
-          gap: .8rem;
-          flex-wrap: wrap;
-          margin-top: 1.5rem;
-        }
-
-        .products-page .bp {
+        .pd-cta-button {
           display: inline-flex;
-          align-items: center;
-          padding: .75rem 1.2rem;
-          background: #111;
-          color: #fff;
-          border-radius: 7px;
-          font-size: .78rem;
-          font-weight: 700;
-          text-decoration: none;
+          padding: 17px 28px;
+          border-radius: 15px;
+          background: #fff;
+          color: #08090d;
+          font-weight: 900;
+          transition: .3s ease;
         }
 
-        .products-page .bp:hover {
-          background: #f01965;
-        }
-
-        .products-page .bp-pink {
-          display: inline-flex;
-          align-items: center;
-          padding: .85rem 1.5rem;
-          background: #f01965;
-          color: #fff;
-          border-radius: 7px;
-          font-size: .82rem;
-          font-weight: 700;
-          text-decoration: none;
-        }
-
-        .products-page .bp-pink:hover {
-          background: #111;
-        }
-
-        .products-page .cta-note {
-          font-size: .72rem;
-          margin-top: 1rem;
+        .pd-cta-button:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 60px rgba(255,255,255,.15);
         }
 
         /* FOOTER */
-        .products-page footer {
-          max-width: none;
-          background: #111;
-          color: rgba(255,255,255,.5);
-          padding: 2.5rem 2rem;
+
+        .pd-footer {
+          padding: 35px 7vw;
+          border-top: 1px solid rgba(255,255,255,.08);
+          background: #07080b;
         }
 
-        .products-page .f-in {
-          max-width: 1140px;
-          margin: 0 auto;
+        .pd-footer-inner {
+          max-width: 1180px;
+          margin: auto;
           display: flex;
-          align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 1rem;
+          align-items: center;
+          gap: 20px;
         }
 
-        .products-page .f-brand {
-          font-family: "Raleway", sans-serif;
-          font-size: 1.05rem;
+        .pd-footer-logo {
+          font-size: 23px;
           font-weight: 900;
-          color: #fff;
         }
 
-        .products-page .f-brand span {
+        .pd-footer-logo span {
           color: #f01965;
         }
 
-        .products-page .f-links {
-          display: flex;
-          gap: 1.5rem;
-          flex-wrap: wrap;
+        .pd-footer-text {
+          color: rgba(255,255,255,.4);
+          font-size: 12px;
+          text-align: right;
         }
 
-        .products-page .f-links a {
-          font-size: .75rem;
-          color: rgba(255,255,255,.45);
-          text-decoration: none;
+        /* REVEAL */
+
+        .pd-reveal {
+          opacity: 0;
+          transform: translateY(45px);
+          transition:
+            opacity .8s ease,
+            transform .8s cubic-bezier(.2,.8,.2,1);
         }
 
-        .products-page .f-links a:hover {
-          color: #f01965;
+        .pd-visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
-        .products-page .f-meta {
-          font-size: .72rem;
-        }
+        /* MOBILE */
 
-        @media (max-width: 900px) {
-          .products-page .nav-links {
+        @media (max-width: 1050px) {
+
+          .pd-links,
+          .pd-talk {
             display: none;
           }
 
-          .products-page .page-hero {
-            padding: 80px 1.2rem 70px;
+          .pd-menu {
+            display: block;
           }
 
-          .products-page .page-hero h1 {
-            font-size: clamp(2.8rem, 10vw, 4rem);
-          }
-
-          .products-page section {
-            padding: 55px 1.2rem;
-          }
-
-          .products-page .prod-card {
+          .pd-hero-inner {
             grid-template-columns: 1fr;
-            padding: 25px;
           }
 
-          .products-page .pasides {
-            grid-template-columns: 1fr 1fr;
+          .pd-visual {
+            min-height: 450px;
           }
 
-          .products-page .fw5 {
-            grid-template-columns: repeat(2,1fr);
+          .pd-selector {
+            grid-template-columns: 1fr;
           }
+
+          .pd-feature-grid {
+            grid-template-columns: 1fr;
+          }
+
         }
 
-        @media (max-width: 600px) {
-          .products-page .pasides,
-          .products-page .fw5 {
+        @media (max-width: 760px) {
+
+          .pd-nav {
+            top: 8px;
+            width: calc(100% - 18px);
+            border-radius: 18px;
+          }
+
+          .pd-mobile-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(10,11,17,.97);
+            backdrop-filter: blur(20px);
+          }
+
+          .pd-mobile-menu a {
+            display: block;
+            padding: 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,.72);
+            font-weight: 700;
+          }
+
+          .pd-hero {
+            padding: 130px 20px 70px;
+          }
+
+          .pd-hero h1 {
+            font-size: 53px;
+            letter-spacing: -3px;
+          }
+
+          .pd-hero-copy {
+            font-size: 15px;
+          }
+
+          .pd-visual {
+            min-height: 390px;
+          }
+
+          .pd-device {
+            width: 285px;
+            min-height: 315px;
+          }
+
+          .pd-orbit {
+            width: 300px;
+            height: 300px;
+          }
+
+          .pd-floating {
+            padding: 10px 12px;
+          }
+
+          .pd-floating-one {
+            top: 30px;
+            right: 0;
+          }
+
+          .pd-floating-two {
+            left: 0;
+            bottom: 50px;
+          }
+
+          .pd-floating-three {
+            right: 0;
+            bottom: 0;
+          }
+
+          .pd-section {
+            padding: 85px 20px;
+          }
+
+          .pd-title {
+            font-size: 43px;
+            letter-spacing: -2px;
+          }
+
+          .pd-detail {
+            padding: 27px;
+          }
+
+          .pd-detail h3 {
+            font-size: 45px;
+          }
+
+          .pd-stats {
             grid-template-columns: 1fr;
           }
 
-          .products-page .abhra-wm {
+          .pd-feature-card {
+            min-height: 350px;
+            padding: 28px;
+          }
+
+          .pd-feature-card h3 {
+            font-size: 43px;
+          }
+
+          .pd-feature-visual {
+            min-height: 350px;
+          }
+
+          .pd-feature-list {
+            grid-template-columns: 1fr;
+          }
+
+          .pd-cta {
+            padding: 100px 20px;
+          }
+
+          .pd-cta h2 {
+            font-size: 52px;
+            letter-spacing: -3px;
+          }
+
+          .pd-footer {
+            padding: 28px 20px;
+          }
+
+          .pd-footer-inner {
+            flex-direction: column;
             align-items: flex-start;
-            flex-wrap: wrap;
           }
+
+          .pd-footer-text {
+            text-align: left;
+          }
+
         }
+
       `}</style>
 
-      <div className="products-page">
+      <div className="pd-page">
 
         {/* NAVBAR */}
-        <nav>
-          <div className="nav-in">
-            <a href="/" className="logo">
+
+        <nav className="pd-nav">
+
+          <div className="pd-nav-inner">
+
+            <a href="/" className="pd-logo">
               Code<span>Cap</span>
             </a>
 
-            <ul className="nav-links">
-              <li><a href="/venture-studio">Venture Studio</a></li>
-              <li><a href="/services">Services</a></li>
-              <li><a href="/products">Products</a></li>
-              <li><a href="/portfolio">Portfolio</a></li>
-              <li><a href="/team">Team</a></li>
-              <li><a href="/insights">Insights</a></li>
-              <li><a href="/podcast">Podcast</a></li>
-            </ul>
+            <div className="pd-links">
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a href="/services">
+                Services
+              </a>
+
+              <a
+                href="/products"
+                className="pd-active"
+              >
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+            </div>
 
             <button
-              className="btn-talk"
-              onClick={() => {
-                window.location.href = "mailto:hello@codecap.ai";
-              }}
+              className="pd-talk"
+              onClick={() =>
+                (window.location.href =
+                  "mailto:hello@codecap.ai")
+              }
             >
               Talk to us
             </button>
+
+            <button
+              className="pd-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "×" : "☰"}
+            </button>
+
           </div>
+
+          {menuOpen && (
+            <div className="pd-mobile-menu">
+
+              <a
+                href="/"
+                onClick={() => setMenuOpen(false)}
+              >
+                Home
+              </a>
+
+              <a
+                href="/venture-studio"
+                onClick={() => setMenuOpen(false)}
+              >
+                Venture Studio
+              </a>
+
+              <a
+                href="/services"
+                onClick={() => setMenuOpen(false)}
+              >
+                Services
+              </a>
+
+              <a
+                href="/products"
+                onClick={() => setMenuOpen(false)}
+              >
+                Products
+              </a>
+
+              <a
+                href="/portfolio"
+                onClick={() => setMenuOpen(false)}
+              >
+                Portfolio
+              </a>
+
+              <a
+                href="/team"
+                onClick={() => setMenuOpen(false)}
+              >
+                Team
+              </a>
+
+              <a
+                href="/insights"
+                onClick={() => setMenuOpen(false)}
+              >
+                Insights
+              </a>
+
+              <a
+                href="/podcast"
+                onClick={() => setMenuOpen(false)}
+              >
+                Podcast
+              </a>
+
+              <a
+                href="mailto:hello@codecap.ai"
+                onClick={() => setMenuOpen(false)}
+              >
+                Talk to us →
+              </a>
+
+            </div>
+          )}
+
         </nav>
 
         {/* HERO */}
-        <div className="page-hero">
-          <div className="eyebrow-text">CodeCap Products</div>
-          <div className="divider"></div>
 
-          <h1>
-            We don't just advise.
-            <br />
-            We ship.
-          </h1>
+        <section className="pd-hero">
 
-          <p>
-            CodeCap builds and commercialises its own AI-powered and
-            cybersecurity products for enterprise buyers across Southeast
-            Asia, the Gulf, and South Asia — with a focus on intelligent
-            automation, threat detection, and sovereign cloud security.
-          </p>
-        </div>
+          <div className="pd-grid"></div>
 
-        {/* FLAGSHIP PRODUCT */}
-        <section>
-          <div className="eyebrow-text">Flagship Product</div>
-          <div className="divider"></div>
+          <div className="pd-glow pd-glow-one"></div>
+          <div className="pd-glow pd-glow-two"></div>
 
-          <h2>
-            Abhra — sovereign cloud security
-            <br />
-            for the <span className="accent">regulated economy.</span>
-          </h2>
+          <div className="pd-hero-inner">
 
-          <p className="lead">
-            Universal-inventory scanning across every AWS, Azure, and GCP
-            resource, mapped to 25 compliance frameworks. Desktop-first. Your
-            scan data never leaves your machine.
-          </p>
+            <div className="pd-reveal">
 
-          <div className="abhra-block">
-            <div className="abhra-wm">
-              <div className="abhra-ic">☁️</div>
-
-              <div>
-                <div
-                  style={{
-                    fontFamily: "var(--ff-h)",
-                    fontSize: "1.3rem",
-                    fontWeight: "900",
-                    color: "var(--dark2)"
-                  }}
-                >
-                  Abhra{" "}
-                  <span
-                    style={{
-                      fontSize: "0.7em",
-                      fontWeight: "400",
-                      color: "var(--muted)"
-                    }}
-                  >
-                    अभ्र
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "0.68rem",
-                    color: "var(--muted)"
-                  }}
-                >
-                  Built by CrownTrend India · Distributed by CodeCap ·{" "}
-                  <a
-                    href="https://abhra.world"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: "var(--blue)" }}
-                  >
-                    abhra.world
-                  </a>
-                </div>
+              <div className="pd-label">
+                CodeCap Products
               </div>
 
-              <div style={{ marginLeft: "auto" }}>
-                <span className="status-live">
-                  <span className="sdot"></span>
-                  Live — Free 30-Day Trial
+              <h1>
+                We don't just
+                <br />
+                advise.
+                <br />
+                We <span className="pd-gradient">
+                  ship.
                 </span>
-              </div>
-            </div>
+              </h1>
 
-            <p
-              style={{
-                fontSize: "0.9rem",
-                color: "var(--muted)",
-                lineHeight: "1.82",
-                maxWidth: "700px",
-                marginBottom: "0"
-              }}
-            >
-              The Sanskrit word <em>अभ्र</em> means cloud — the rain-bearing
-              kind. Abhra walks through every corner of your AWS, Azure, and
-              GCP, finds the risks that shouldn't be there, and maps them to
-              the frameworks your auditor cares about — in a language
-              engineers can act on. Your scan data never leaves your laptop.
-              This is the architecture, not a marketing claim.
-            </p>
+              <p className="pd-hero-copy">
+                CodeCap builds and commercialises its own
+                AI-powered and cybersecurity products for
+                enterprise buyers across Southeast Asia,
+                the Gulf, and South Asia — with a focus on
+                intelligent automation, threat detection,
+                and sovereign cloud security.
+              </p>
 
-            <div className="stats-strip">
-              <div>
-                <div className="stat-n">1,894+</div>
-                <div className="stat-l">Native Security Checks</div>
-              </div>
+              <div className="pd-actions">
 
-              <div>
-                <div className="stat-n">25</div>
-                <div className="stat-l">Compliance Frameworks</div>
-              </div>
-
-              <div>
-                <div className="stat-n">100%</div>
-                <div className="stat-l">Scan Data On-Machine</div>
-              </div>
-
-              <div>
-                <div className="stat-n">Read-only</div>
-                <div className="stat-l">
-                  Cloud Access — Never Modifies Infra
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* FULL CAPABILITIES */}
-          <div
-            className="prod-card featured"
-            style={{ marginTop: "0" }}
-          >
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.6rem",
-                  marginBottom: "1rem",
-                  flexWrap: "wrap"
-                }}
-              >
-                <span className="tag tag-pink">Cloud Security</span>
-                <span className="tag tag-blue">CSPM / CNAPP</span>
-                <span className="tag tag-green">Agentless</span>
-                <span className="tag tag-green">
-                  Sovereign Deployment
-                </span>
-              </div>
-
-              <div className="pname">Full Capabilities</div>
-
-              <div className="ptag">
-                AWS · Azure · GCP · Windows / macOS / Linux · Air-gappable ·
-                USD / EUR / INR / AED billing
-              </div>
-
-              <div className="pdesc">
-                The alternative to Wiz, Prisma Cloud, Defender for Cloud, and
-                Orca Security for regulated buyers who cannot send cloud
-                telemetry to a vendor's multi-tenant SaaS. Same category —
-                agentless cloud security posture, universal inventory, deep
-                compliance — built desktop-first and air-gappable from day
-                one.
-              </div>
-
-              <div className="pfeats">
-                <div className="pf">
-                  Agentless universal inventory — every AWS, Azure, GCP
-                  resource via Cloud Control API, Resource Graph, and Cloud
-                  Asset Inventory. No agents, no sidecars, read-only
-                  credentials only.
-                </div>
-
-                <div className="pf">
-                  25 compliance frameworks — ISO 27001, SOC 2 Type II, PCI DSS
-                  4.0, GDPR, EU NIS2, DORA, NESA UAE, SAMA Saudi, MAS TRM
-                  Singapore, HIPAA, India BFSI (SEBI, RBI, CERT-In, DPDPA).
-                </div>
-
-                <div className="pf">
-                  IAM + network + storage analysis — identity over-privilege,
-                  exposed credentials, public storage, security-group
-                  sprawl, untracked attack paths as a who-can-reach-what
-                  graph.
-                </div>
-
-                <div className="pf">
-                  Ticketing integrations — Jira, ServiceNow, Azure DevOps,
-                  Linear, GitHub Issues, GitLab Issues, PagerDuty,
-                  Freshservice, custom REST, or email.
-                </div>
-
-                <div className="pf">
-                  SIEM / SOAR streaming — Splunk, Microsoft Sentinel, Google
-                  Chronicle, Palo Alto XSOAR, Elastic, syslog, or any
-                  webhook.
-                </div>
-
-                <div className="pf">
-                  Desktop-first, sovereignty-aware — runs on Windows, macOS,
-                  Linux. SQLite-local storage. Scan history, evidence, and
-                  reports never touch a vendor cloud.
-                </div>
-
-                <div className="pf">
-                  Auditor-ready evidence — check ID, framework citations,
-                  resource reference, remediation runbook. PDF + Excel for
-                  regulators.
-                </div>
-
-                <div className="pf">
-                  Air-gapped environments — on-prem license server, fully
-                  offline install for high-security and government
-                  environments.
-                </div>
-              </div>
-            </div>
-
-            <div className="pasides">
-              <div className="pa">
-                <div className="pal">Cloud Platforms</div>
-                <span className="pat">AWS</span>
-                <span className="pat">Azure</span>
-                <span className="pat">GCP</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">Runs On</div>
-                <span className="pat">Windows</span>
-                <span className="pat">macOS</span>
-                <span className="pat">Linux</span>
-                <span className="pat">Air-gapped</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">Target Buyers</div>
-                <span className="pat">Platform Engineers</span>
-                <span className="pat">CISOs</span>
-                <span className="pat">GRC Teams</span>
-                <span className="pat">BFSI</span>
-                <span className="pat">Healthtech</span>
-                <span className="pat">Gov</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">Key Integrations</div>
-                <span className="pat">Jira</span>
-                <span className="pat">ServiceNow</span>
-                <span className="pat">Splunk</span>
-                <span className="pat">Sentinel</span>
-                <span className="pat">GitHub</span>
-                <span className="pat">PagerDuty</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">Billing Currencies</div>
-                <span className="pat">USD</span>
-                <span className="pat">EUR</span>
-                <span className="pat">INR</span>
-                <span className="pat">AED</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">CodeCap Markets</div>
-                <span className="pat">🇸🇬 Singapore</span>
-                <span className="pat">🇦🇪 UAE</span>
-                <span className="pat">🇸🇦 KSA</span>
-                <span className="pat">🇮🇳 India</span>
-              </div>
-
-              <div style={{ marginTop: "0.5rem" }}>
                 <a
-                  href="https://abhra.world/download"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bp-pink"
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    borderRadius: "30px"
-                  }}
+                  href="#products"
+                  className="pd-primary"
                 >
-                  Download Free Trial →
+                  Explore Products →
                 </a>
+
+                <a
+                  href="mailto:products@codecap.ai"
+                  className="pd-secondary"
+                >
+                  Contact Product Team
+                </a>
+
               </div>
+
             </div>
+
+            <div className="pd-visual pd-reveal">
+
+              <div className="pd-orbit"></div>
+
+              <div className="pd-device">
+
+                <div className="pd-window">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <div className="pd-device-label">
+                  CodeCap Product Engine
+                </div>
+
+                <div className="pd-device-name">
+                  Security
+                </div>
+
+                <div className="pd-device-status">
+                  Active
+                </div>
+
+                <div className="pd-device-grid">
+
+                  <div className="pd-device-box">
+                    <strong>AI</strong>
+                    <small>Automation</small>
+                  </div>
+
+                  <div className="pd-device-box">
+                    <strong>25</strong>
+                    <small>Frameworks</small>
+                  </div>
+
+                  <div className="pd-device-box">
+                    <strong>3</strong>
+                    <small>Clouds</small>
+                  </div>
+
+                  <div className="pd-device-box">
+                    <strong>1.8K+</strong>
+                    <small>Checks</small>
+                  </div>
+
+                  <div className="pd-device-box">
+                    <strong>GRC</strong>
+                    <small>Security</small>
+                  </div>
+
+                  <div className="pd-device-box">
+                    <strong>∞</strong>
+                    <small>Scale</small>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div className="pd-floating pd-floating-one">
+                <strong>ABHRA</strong>
+                <small>Live</small>
+              </div>
+
+              <div className="pd-floating pd-floating-two">
+                <strong>ILCM</strong>
+                <small>In Development</small>
+              </div>
+
+              <div className="pd-floating pd-floating-three">
+                <strong>SECURE</strong>
+                <small>By Design</small>
+              </div>
+
+            </div>
+
           </div>
 
-          {/* FRAMEWORKS */}
-          <h3
-            style={{
-              marginTop: "2.5rem",
-              marginBottom: "1rem"
-            }}
-          >
-            25 Compliance Frameworks — Regional regulators get the same depth
-            as SOC 2 or ISO 27001.
-          </h3>
-
-          <div className="fw5">
-            <div className="fw-item">
-              <div className="fw-title">Global Baseline</div>
-              <p>
-                ISO 27001 · SOC 2 Type II · PCI DSS 4.0 · HIPAA · NIST CSF 2.0
-              </p>
-            </div>
-
-            <div className="fw-item">
-              <div className="fw-title">EU + UK</div>
-              <p>
-                GDPR · EU NIS2 · EU DORA · UK Cyber Essentials+ · ISO 27018
-              </p>
-            </div>
-
-            <div className="fw-item">
-              <div className="fw-title">Middle East</div>
-              <p>
-                NESA UAE · SAMA Saudi · PDPL Saudi · MAS TRM Singapore · CMMC
-              </p>
-            </div>
-
-            <div className="fw-item">
-              <div className="fw-title">India BFSI</div>
-              <p>
-                SEBI Cybersecurity · RBI IT Framework · CERT-In · DPDPA
-              </p>
-            </div>
-
-            <div className="fw-item">
-              <div className="fw-title">Cloud-Native</div>
-              <p>
-                AWS Well-Architected · FedRAMP · MITRE ATT&CK · CIS
-                AWS/Azure/GCP
-              </p>
-            </div>
-          </div>
         </section>
 
-        {/* OTHER PRODUCTS */}
-        <section style={{ background: "var(--bg2)" }}>
-          <div className="eyebrow-text">Also in the Portfolio</div>
-          <div className="divider"></div>
+        {/* PRODUCT SELECTOR */}
 
-          <h2>
-            More products <span className="accent">in development.</span>
-          </h2>
+        <section
+          className="pd-section"
+          id="products"
+        >
 
-          {/* ILCM */}
-          <div
-            className="prod-card"
-            style={{ marginBottom: "2rem" }}
-          >
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.6rem",
-                  marginBottom: "1rem",
-                  flexWrap: "wrap"
-                }}
-              >
-                <span className="tag tag-pink">Cybersecurity</span>
+          <div className="pd-container">
 
-                <span className="status-dev">
-                  <span className="sdot d"></span>
-                  In Development
-                </span>
+            <div className="pd-reveal">
+
+              <div className="pd-section-label">
+                Product Portfolio
               </div>
 
-              <div className="pname">
-                Autonomous ILCM Platform
-              </div>
+              <h2 className="pd-title">
+                Products built
+                <br />
+                <span>from the operator's seat.</span>
+              </h2>
 
-              <div className="ptag">
-                Incident Lifecycle & Convergence Management · Orchestrates
-                Existing Tools · No Data Lake Required
-              </div>
-
-              <div className="pdesc">
-                An AI-powered incident lifecycle platform autonomously
-                managing the full post-detection response chain. Five
-                specialised AI bots (Triage, Investigation, Containment,
-                Validation, PIR) orchestrate across existing SIEM and EDR
-                tooling via API. Every decision is auditable, humans stay in
-                control.
-              </div>
-
-              <div className="pfeats">
-                <div className="pf">
-                  Triage Bot — autonomous alert classification & noise
-                  reduction
-                </div>
-
-                <div className="pf">
-                  Investigation Bot — evidence collection & kill chain
-                  mapping
-                </div>
-
-                <div className="pf">
-                  Containment Bot — autonomous threat isolation & response
-                </div>
-
-                <div className="pf">
-                  Validation Bot — remediation confirmation & recurrence
-                  checks
-                </div>
-
-                <div className="pf">
-                  PIR Bot — post-incident review & self-learning loop
-                </div>
-
-                <div className="pf">
-                  Human-in-the-loop with configurable confidence thresholds
-                </div>
-
-                <div className="pf">
-                  Full audit trail & chain-of-custody export for SOC 2 / NIST
-                </div>
-              </div>
             </div>
 
-            <div className="pasides">
-              <div className="pa">
-                <div className="pal">Target Users</div>
-                <span className="pat">CISO</span>
-                <span className="pat">SOC Manager</span>
-                <span className="pat">Analyst</span>
-                <span className="pat">Auditor / GRC</span>
+            <div className="pd-selector">
+
+              <div className="pd-tabs pd-reveal">
+
+                {products.map((product, index) => (
+                  <button
+                    key={product.name}
+                    className={
+                      activeProduct === index
+                        ? "pd-tab active"
+                        : "pd-tab"
+                    }
+                    onClick={() =>
+                      setActiveProduct(index)
+                    }
+                  >
+
+                    <span className="pd-tab-number">
+                      PRODUCT / 0{index + 1}
+                    </span>
+
+                    <span className="pd-tab-name">
+                      {product.name}
+                    </span>
+
+                    <span className="pd-tab-status">
+                      {product.status}
+                    </span>
+
+                  </button>
+                ))}
+
               </div>
 
-              <div className="pa">
-                <div className="pal">Integrations</div>
-                <span className="pat">Splunk / SIEM</span>
-                <span className="pat">CrowdStrike / EDR</span>
-                <span className="pat">Email Gateway</span>
-                <span className="pat">Shodan</span>
-              </div>
+              <div className="pd-detail pd-reveal">
 
-              <div className="pa">
-                <div className="pal">Stack</div>
-                <span className="pat">Next.js 15</span>
-                <span className="pat">React 19</span>
-                <span className="pat">GPT-4o</span>
-                <span className="pat">Supabase</span>
-              </div>
-            </div>
-          </div>
+                <div className="pd-detail-top">
 
-          {/* CLOUD BOM */}
-          <div className="prod-card">
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.6rem",
-                  marginBottom: "1rem",
-                  flexWrap: "wrap"
-                }}
-              >
-                <span className="tag tag-pink">Cybersecurity</span>
+                  <div className="pd-detail-category">
+                    {products[activeProduct].category}
+                  </div>
 
-                <span className="status-live">
-                  <span className="sdot"></span>
-                  Live
-                </span>
-              </div>
+                  <div className="pd-detail-status">
+                    {products[activeProduct].status}
+                  </div>
 
-              <div className="pname">
-                Cloud-BOM — now superseded by Abhra
-              </div>
+                </div>
 
-              <div className="ptag">
-                On-Premises Cloud Security · Zero Cloud Data Exposure ·
-                Distributed by CodeCap ·{" "}
+                <h3>
+                  {products[activeProduct].name}
+                </h3>
+
+                <div className="pd-detail-description">
+                  {products[activeProduct].description}
+                </div>
+
+                <p className="pd-detail-text">
+                  {products[activeProduct].fullDescription}
+                </p>
+
+                <div className="pd-stats">
+
+                  <div className="pd-stat">
+                    <strong>
+                      {products[activeProduct].checks}
+                    </strong>
+                    <small>
+                      Security Checks
+                    </small>
+                  </div>
+
+                  <div className="pd-stat">
+                    <strong>
+                      {products[activeProduct].frameworks}
+                    </strong>
+                    <small>
+                      Frameworks / Access
+                    </small>
+                  </div>
+
+                  <div className="pd-stat">
+                    <strong>
+                      {products[activeProduct].clouds}
+                    </strong>
+                    <small>
+                      Coverage
+                    </small>
+                  </div>
+
+                </div>
+
                 <a
-                  href="https://abhra.world"
-                  target="_blank"
-                  rel="noreferrer"
+                  href={products[activeProduct].link}
+                  className="pd-detail-button"
                 >
-                  abhra.world
+                  {products[activeProduct].button} →
                 </a>
+
               </div>
 
-              <div className="pdesc">
-                Cloud-BOM discovers, maps, and secures your entire cloud
-                infrastructure running fully on-premises. AI-driven risk
-                scoring, attack path visualisation, and automated compliance
-                mapping across six major frameworks. Complete security
-                posture report in under five minutes.
-              </div>
-
-              <div className="pfeats">
-                <div className="pf">
-                  Discovers 50+ AWS service types (EC2, S3, Lambda, RDS, IAM,
-                  VPC & more)
-                </div>
-
-                <div className="pf">
-                  AI-powered risk scoring with attack scenario generation &
-                  blast radius assessment
-                </div>
-
-                <div className="pf">
-                  Interactive attack path visualisation — lateral movement &
-                  privilege escalation
-                </div>
-
-                <div className="pf">
-                  Automated compliance: SOC 2, ISO 27001, NIST CSF, CIS
-                  Benchmarks, CERT-In, HIPAA
-                </div>
-
-                <div className="pf">
-                  AES-256 credential encryption, machine-bound licensing, zero
-                  telemetry
-                </div>
-              </div>
             </div>
 
-            <div className="pasides">
-              <div className="pa">
-                <div className="pal">Frameworks</div>
-                <span className="pat">SOC 2</span>
-                <span className="pat">ISO 27001</span>
-                <span className="pat">NIST CSF</span>
-                <span className="pat">CIS</span>
-                <span className="pat">CERT-In</span>
-                <span className="pat">HIPAA</span>
-              </div>
-
-              <div className="pa">
-                <div className="pal">Commercialisation</div>
-                <span className="pat">Distributed by CodeCap</span>
-                <span className="pat">Distributed by CodeCap</span>
-              </div>
-            </div>
           </div>
+
+        </section>
+
+        {/* ABHRA FEATURE */}
+
+        <section className="pd-section pd-feature">
+
+          <div className="pd-container">
+
+            <div className="pd-reveal">
+
+              <div className="pd-section-label">
+                Flagship Product
+              </div>
+
+              <h2 className="pd-title">
+                Abhra —
+                <br />
+                <span>
+                  sovereign cloud security for the regulated economy.
+                </span>
+              </h2>
+
+            </div>
+
+            <div className="pd-feature-grid">
+
+              <div className="pd-feature-card pd-reveal pd-tilt">
+
+                <div className="pd-feature-tag">
+                  Available Now
+                </div>
+
+                <h3>
+                  Abhra
+                </h3>
+
+                <p>
+                  Universal-inventory scanning across AWS,
+                  Azure and GCP, mapped to 25 compliance
+                  frameworks. Desktop-first, with scan data
+                  never leaving the machine.
+                </p>
+
+                <a
+                  href="https://abhra.world/download"
+                  className="pd-feature-link"
+                >
+                  Download Abhra →
+                </a>
+
+              </div>
+
+              <div className="pd-feature-visual pd-reveal">
+
+                <div className="pd-security-sphere"></div>
+
+                <div className="pd-feature-chip pd-chip-one">
+                  AWS
+                </div>
+
+                <div className="pd-feature-chip pd-chip-two">
+                  AZURE
+                </div>
+
+                <div className="pd-feature-chip pd-chip-three">
+                  GCP
+                </div>
+
+                <div className="pd-feature-chip pd-chip-four">
+                  25 FRAMEWORKS
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* CAPABILITIES */}
+
+        <section className="pd-section">
+
+          <div className="pd-container">
+
+            <div className="pd-reveal">
+
+              <div className="pd-section-label">
+                Product Capabilities
+              </div>
+
+              <h2 className="pd-title">
+                Security without
+                <br />
+                <span>sending your data away.</span>
+              </h2>
+
+            </div>
+
+            <div className="pd-feature-list">
+
+              <div className="pd-feature-item pd-reveal">
+
+                <div className="pd-feature-item-number">
+                  01
+                </div>
+
+                <h3>
+                  Universal Cloud Inventory
+                </h3>
+
+                <p>
+                  Scan environments across AWS, Azure
+                  and GCP.
+                </p>
+
+              </div>
+
+              <div className="pd-feature-item pd-reveal">
+
+                <div className="pd-feature-item-number">
+                  02
+                </div>
+
+                <h3>
+                  Compliance Mapping
+                </h3>
+
+                <p>
+                  Security checks mapped across 25
+                  compliance frameworks.
+                </p>
+
+              </div>
+
+              <div className="pd-feature-item pd-reveal">
+
+                <div className="pd-feature-item-number">
+                  03
+                </div>
+
+                <h3>
+                  Desktop-First
+                </h3>
+
+                <p>
+                  Designed so scan data never leaves
+                  the machine.
+                </p>
+
+              </div>
+
+              <div className="pd-feature-item pd-reveal">
+
+                <div className="pd-feature-item-number">
+                  04
+                </div>
+
+                <h3>
+                  Sovereign Deployment
+                </h3>
+
+                <p>
+                  Built with the requirements of regulated
+                  enterprise environments in mind.
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
         </section>
 
         {/* CTA */}
-        <section className="cta-sec">
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--ff-b)",
-                fontSize: "0.72rem",
-                fontWeight: "600",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#f01965",
-                marginBottom: "1rem"
-              }}
-            >
+
+        <section className="pd-cta">
+
+          <div className="pd-reveal">
+
+            <div className="pd-section-label">
               Get Started
             </div>
 
             <h2>
-              Try Abhra or get early{" "}
-              <span className="accent">access to ILCM.</span>
+              Try Abhra.
+              <br />
+              Join ILCM.
             </h2>
 
             <p>
-              Abhra is available now with a free 30-day trial. ILCM is in
-              development — reach out to join the early access programme.
+              Abhra is available now with a free 30-day trial.
+              ILCM is in development — reach out to join the
+              early access programme.
             </p>
 
-            <div className="cta-acts">
-              <a
-                href="https://abhra.world/download"
-                target="_blank"
-                rel="noreferrer"
-                className="bp"
-              >
-                Download Abhra Free →
-              </a>
+            <a
+              href="mailto:products@codecap.ai"
+              className="pd-cta-button"
+            >
+              Contact Product Team →
+            </a>
 
-              <a
-                href="mailto:products@codecap.ai"
-                className="bp-pink"
-              >
-                Request ILCM Access
-              </a>
-            </div>
-
-            <p className="cta-note">
-              products@codecap.ai
-            </p>
           </div>
+
         </section>
 
         {/* FOOTER */}
-        <footer>
-          <div className="f-in">
-            <div className="f-brand">
+
+        <footer className="pd-footer">
+
+          <div className="pd-footer-inner">
+
+            <div className="pd-footer-logo">
               Code<span>Cap</span>
             </div>
 
-            <div className="f-links">
-              <a href="/venture-studio">Venture Studio</a>
-              <a href="/services">Services</a>
-              <a href="/products">Products</a>
-              <a href="/portfolio">Portfolio</a>
-              <a href="/team">Team</a>
-              <a href="/insights">Insights</a>
-              <a href="/podcast">Podcast</a>
+            <div className="pd-footer-text">
+              © 2025 CodeCap Ventures · Singapore · UAE · India
+              <br />
+              products@codecap.ai
             </div>
 
-            <div className="f-meta">
-              © 2025 CodeCap Ventures · Singapore · UAE · India ·
-              hello@codecap.ai
-            </div>
           </div>
+
         </footer>
 
       </div>

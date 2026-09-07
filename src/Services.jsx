@@ -1,705 +1,1901 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 function Services() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeService, setActiveService] = useState(0);
+
   useEffect(() => {
+    const reveals = document.querySelectorAll(".sv-reveal");
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            entry.target.classList.add("sv-visible");
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.12 }
     );
 
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    reveals.forEach((item) => observer.observe(item));
 
-    return () => observer.disconnect();
+    const cards = document.querySelectorAll(".sv-tilt");
+
+    const moveCard = (e) => {
+      const card = e.currentTarget;
+      const rect = card.getBoundingClientRect();
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const rotateX =
+        ((y - rect.height / 2) / rect.height) * -6;
+
+      const rotateY =
+        ((x - rect.width / 2) / rect.width) * 6;
+
+      card.style.transform = `
+        perspective(1000px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-8px)
+      `;
+    };
+
+    const resetCard = (e) => {
+      e.currentTarget.style.transform =
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("mousemove", moveCard);
+      card.addEventListener("mouseleave", resetCard);
+    });
+
+    return () => {
+      observer.disconnect();
+
+      cards.forEach((card) => {
+        card.removeEventListener("mousemove", moveCard);
+        card.removeEventListener("mouseleave", resetCard);
+      });
+    };
   }, []);
+
+  const services = [
+    {
+      number: "01",
+      title: "Venture Building & Co-founding",
+      short: "Build from the beginning.",
+      best: "Pre-idea founders",
+      text:
+        "We're not your advisor. We're your co-founder, with equity on the line.",
+      detail:
+        "At the pre-idea stage, we function as operational co-founders — shaping the problem space, validating the market thesis, and building the foundational product. Not a workshop. A real company, built from the inside.",
+      points: [
+        "Problem space definition & market validation",
+        "Co-founder-level commitment with milestone-vested equity",
+        "Technical architecture & product roadmap ownership",
+        "First-hire strategy and cap table structuring",
+        "Investor narrative development from day one"
+      ]
+    },
+    {
+      number: "02",
+      title: "Product Development & Tech Execution",
+      short: "Turn product vision into reality.",
+      best: "Pre-seed to Seed",
+      text:
+        "Code that survives enterprise procurement, not a demo that survives a pitch.",
+      detail:
+        "We take technical execution seriously — from architecture and product roadmap through the engineering work required to create something customers can actually use.",
+      points: [
+        "Product architecture",
+        "Technical roadmap",
+        "Engineering execution",
+        "Enterprise-ready product thinking",
+        "Technology delivery"
+      ]
+    },
+    {
+      number: "03",
+      title: "Go-to-Market Strategy & Sales",
+      short: "Build the commercial engine.",
+      best: "MVP to Seed stage",
+      text:
+        "From positioning to pipeline, we help turn a product into a business.",
+      detail:
+        "We work with founders on positioning, customer conversations, sales execution and the first repeatable commercial motion.",
+      points: [
+        "Market positioning",
+        "Sales strategy",
+        "Pipeline development",
+        "Enterprise customer engagement",
+        "Regional GTM execution"
+      ]
+    },
+    {
+      number: "04",
+      title: "Fundraising Support & VC Introductions",
+      short: "Prepare for the next round.",
+      best: "Pre-seed to Series A",
+      text:
+        "Investor narrative, preparation and introductions when the company is ready.",
+      detail:
+        "Fundraising works best when the business already has a clear story. We help founders prepare the narrative, sharpen the opportunity and approach relevant investors.",
+      points: [
+        "Investor narrative",
+        "Fundraising preparation",
+        "Pitch positioning",
+        "Investor conversations",
+        "VC introductions"
+      ]
+    },
+    {
+      number: "05",
+      title: "Cyber & Deep Tech Advisory",
+      short: "Experience where complexity matters.",
+      best: "Cyber & deep tech startups",
+      text:
+        "Enterprise cybersecurity and deep-tech experience applied to difficult problems.",
+      detail:
+        "Our team brings enterprise cybersecurity and deep-tech operating experience to startups building in technically demanding markets.",
+      points: [
+        "Cybersecurity strategy",
+        "Enterprise security positioning",
+        "Deep-tech product thinking",
+        "Technical market assessment",
+        "Enterprise readiness"
+      ]
+    },
+    {
+      number: "06",
+      title: "Regional Market Entry",
+      short: "Enter the right market.",
+      best: "SG · UAE · India",
+      text:
+        "Practical support for entering and building across Singapore, UAE and India.",
+      detail:
+        "We help founders understand and execute regional expansion across the markets where CodeCap operates.",
+      points: [
+        "Market-entry strategy",
+        "Regional positioning",
+        "Enterprise introductions",
+        "Sales execution",
+        "Singapore · UAE · India"
+      ]
+    }
+  ];
+
+  const models = [
+    {
+      title: "Cash-Light Build",
+      text:
+        "Lower upfront cash commitment with milestone-based equity."
+    },
+    {
+      title: "Funded Founder GTM",
+      text:
+        "For founders with an existing product who need GTM and sales execution."
+    },
+    {
+      title: "Venture Co-Founder",
+      text:
+        "We join from the earliest stage and operate as a true venture partner."
+    },
+    {
+      title: "Capability Gap",
+      text:
+        "Targeted operating support where a startup needs a specific capability."
+    }
+  ];
 
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600&display=swap');
+      <style>{`
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-img { max-width: 100%; display: block; }
-a { text-decoration: none; color: inherit; }
+        * {
+          box-sizing: border-box;
+        }
 
-/* ── DESIGN TOKENS (Nicepage-inspired) ── */
-:root {
-  --bg:         #ffffff;
-  --bg2:        #f7f9fc;
-  --bg3:        #eef3f8;
-  --dark:       #111111;
-  --dark2:      #293033;
-  --muted:      #6b7a8d;
-  --muted2:     #8fa0b0;
-  --pink:       #f01965;       /* primary accent */
-  --pink-dark:  #cc1357;
-  --pink-light: #fde8ef;
-  --blue:       #029fe7;       /* secondary CTA */
-  --blue-dark:  #0282bc;
-  --blue-light: #e4f5fd;
-  --border:     #e2e8f0;
-  --border2:    rgba(240,25,101,0.15);
-  --grad:       linear-gradient(135deg, #e8e0f7 0%, #fce4ef 50%, #d8edfa 100%);
-  --grad2:      linear-gradient(135deg, #f01965 0%, #029fe7 100%);
-  --ff-h:   'Raleway', sans-serif;
-  --ff-s:   'Roboto', sans-serif;
-  --ff-b:   'Open Sans', sans-serif;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  --shadow2:0 8px 40px rgba(0,0,0,0.12);
-  --radius: 8px;
-  --ease:   cubic-bezier(0.25,0.46,0.45,0.94);
-}
+        html {
+          scroll-behavior: smooth;
+        }
 
-body {
-  background: var(--bg);
-  color: var(--dark);
-  font-family: var(--ff-b);
-  font-size: 16px;
-  line-height: 1.7;
-  overflow-x: hidden;
-}
+        body {
+          margin: 0;
+          background: #08090d;
+          color: #fff;
+          font-family: "Open Sans", Arial, sans-serif;
+        }
 
-/* ── NAVIGATION ── */
-nav {
-  position: sticky; top: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 3rem;
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
-}
-.logo {
-  font-family: var(--ff-h);
-  font-size: 1.4rem; font-weight: 800;
-  color: var(--dark2); letter-spacing: -0.02em;
-}
-.logo span { color: var(--pink); }
-.logo sup { font-size: 0.4em; color: var(--blue); vertical-align: super; margin-left:1px; font-family: var(--ff-b); }
-.nav-links { display: flex; gap: 0.15rem; list-style: none; }
-.nav-links a {
-  font-family: var(--ff-b); font-size: 0.78rem; font-weight: 600;
-  letter-spacing: 0.02em; color: var(--dark2);
-  padding: 0.45rem 0.85rem; border-radius: 4px;
-  transition: color .2s, background .2s;
-}
-.nav-links a:hover { color: var(--pink); background: var(--pink-light); }
-.nav-links a.on { color: var(--pink); background: var(--pink-light); }
-.btn-nav {
-  font-family: var(--ff-b); font-size: 0.78rem; font-weight: 700;
-  padding: 0.6rem 1.5rem; background: var(--blue); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; text-transform: lowercase;
-  transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 14px rgba(2,159,231,0.3);
-}
-.btn-nav:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2,159,231,0.4); }
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
 
-/* ── PAGES ── */
-.pg { display: none; animation: fadeUp .38s var(--ease) forwards; }
-.pg.on { display: block; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+        button {
+          font-family: inherit;
+        }
 
-/* ── COMMON LAYOUT ── */
-section { padding: 5.5rem 3rem; }
-.container { max-width: 1140px; margin: 0 auto; }
+        .sv-page {
+          min-height: 100vh;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 12% 15%,
+              rgba(240,25,101,.12),
+              transparent 28%
+            ),
+            radial-gradient(
+              circle at 88% 25%,
+              rgba(2,159,231,.11),
+              transparent 28%
+            ),
+            #08090d;
+        }
 
-/* ── SECTION LABELS ── */
-.eyebrow {
-  display: inline-block;
-  width: 48px; height: 3px;
-  background: var(--pink);
-  margin-bottom: 1rem;
-  border-radius: 2px;
-}
-.eyebrow-text {
-  font-family: var(--ff-s); font-size: 0.72rem; font-weight: 500;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 0.5rem;
-}
+        /* NAVBAR */
 
-/* ── TYPOGRAPHY ── */
-h1 {
-  font-family: var(--ff-h); font-size: clamp(2.8rem,6vw,5.5rem);
-  font-weight: 900; line-height: 1.0; letter-spacing: -0.02em;
-  color: var(--pink);
-}
-h2 {
-  font-family: var(--ff-h); font-size: clamp(1.9rem,3vw,2.8rem);
-  font-weight: 700; line-height: 1.15; letter-spacing: -0.015em;
-  color: var(--dark2); margin-bottom: 1rem;
-}
-h2 .accent { color: var(--pink); }
-h3 { font-family: var(--ff-s); font-size: 1.05rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.5rem; }
-h4 { font-family: var(--ff-s); font-size: 0.9rem; font-weight: 600; color: var(--dark2); margin-bottom: 0.35rem; }
-p { color: var(--muted); }
-.lead { font-size: 1rem; color: var(--muted); max-width: 560px; line-height: 1.82; font-weight: 300; margin-bottom: 2.5rem; }
+        .sv-nav {
+          position: fixed;
+          z-index: 1000;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(1180px, calc(100% - 32px));
+          padding: 14px 18px;
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 22px;
+          background: rgba(10,11,17,.75);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
 
-/* ── BUTTONS ── */
-.bp {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 700;
-  padding: 0.8rem 2rem; background: var(--blue); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 16px rgba(2,159,231,0.3);
-}
-.bp:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(2,159,231,0.4); }
-.bp-pink {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 700;
-  padding: 0.8rem 2rem; background: var(--pink); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 16px rgba(240,25,101,0.3);
-}
-.bp-pink:hover { background: var(--pink-dark); transform: translateY(-1px); }
-.bg {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 600;
-  padding: 0.8rem 2rem; background: transparent; color: var(--dark2);
-  border: 2px solid var(--dark2); border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: all .2s;
-}
-.bg:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-light); }
+        .sv-nav-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
 
-/* ── CARDS ── */
-.card {
-  background: #fff; border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 2rem;
-  transition: transform .25s, box-shadow .25s, border-color .25s;
-  box-shadow: var(--shadow);
-}
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-color: var(--border2); }
-.card-pink-top { border-top: 3px solid var(--pink); }
-.card-blue-top { border-top: 3px solid var(--blue); }
+        .sv-logo {
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: -1.5px;
+        }
 
-/* ── GRID ── */
-.grid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 2rem; }
-.grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+        .sv-logo span {
+          color: #f01965;
+        }
 
-/* ── TAGS ── */
-.tag {
-  display: inline-block; font-family: var(--ff-b); font-size: 0.65rem;
-  font-weight: 600; padding: 0.22rem 0.65rem; border-radius: 20px;
-  letter-spacing: 0.05em; text-transform: uppercase;
-}
-.tag-pink { background: var(--pink-light); color: var(--pink); }
-.tag-blue { background: var(--blue-light); color: var(--blue-dark); }
-.tag-gray { background: var(--bg3); color: var(--muted); }
-.tag-green { background: #e8faf2; color: #1a8a55; }
-.tag-purple { background: #f0eaff; color: #6c3fc5; }
+        .sv-links {
+          display: flex;
+          gap: 21px;
+          align-items: center;
+        }
 
-/* ── DIVIDER ── */
-.divider { width: 48px; height: 3px; background: var(--pink); border-radius: 2px; margin: 0 0 1.5rem; }
-.divider-center { margin: 0 auto 1.5rem; }
+        .sv-links a {
+          color: rgba(255,255,255,.7);
+          font-size: 13px;
+          font-weight: 700;
+          transition: .25s ease;
+        }
 
-/* ── HERO SECTION ── */
-.hero {
-  min-height: 90vh; display: grid; grid-template-columns: 1fr 1fr;
-  align-items: center; gap: 4rem;
-  padding: 5rem 3rem; background: var(--bg);
-  position: relative; overflow: hidden;
-}
-.hero::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--grad); opacity: 0.25; z-index: 0;
-}
-.hero-content { position: relative; z-index: 2; }
-.hero-visual {
-  position: relative; z-index: 2;
-  background: var(--grad); border-radius: 20px;
-  height: 420px; display: flex; align-items: center; justify-content: center;
-  overflow: hidden; box-shadow: var(--shadow2);
-}
-.hero-vis-inner { text-align: center; }
-.hero-eyebrow { font-family: var(--ff-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
-.hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--pink); flex-shrink: 0; }
-.hero h1 { margin-bottom: 1.5rem; }
-.hero-sub { font-size: 1rem; color: var(--muted); max-width: 460px; line-height: 1.82; margin-bottom: 2.5rem; font-weight: 300; }
-.hero-acts { display: flex; gap: 1rem; flex-wrap: wrap; }
-.hero-stats { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; gap: 2.5rem; flex-wrap: wrap; }
-.stat-n { font-family: var(--ff-h); font-size: 2rem; font-weight: 900; color: var(--pink); line-height: 1; }
-.stat-l { font-family: var(--ff-b); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2); margin-top: 0.2rem; }
+        .sv-links a:hover,
+        .sv-active {
+          color: #fff !important;
+        }
 
-/* ── PAGE HERO ── */
-.page-hero { background: var(--grad); padding: 6rem 3rem 4rem; position: relative; overflow: hidden; }
-.page-hero::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.55); z-index: 0; }
-.page-hero > * { position: relative; z-index: 2; }
-.page-hero h1 { color: var(--pink); font-size: clamp(2.2rem,4.5vw,3.8rem); margin-bottom: 1rem; }
+        .sv-talk {
+          border: 0;
+          padding: 13px 20px;
+          border-radius: 13px;
+          background: linear-gradient(
+            135deg,
+            #f01965,
+            #b70b6d
+          );
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 10px 30px rgba(240,25,101,.25);
+        }
 
-/* ── SERVICE LIST ── */
-.svc-wrap { display: grid; grid-template-columns: 1fr 360px; gap: 3.5rem; align-items: start; }
-.svc-item { display: flex; gap: 1.25rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); transition: opacity .2s; }
-.svc-item:last-child { border-bottom: none; }
-.svc-item:hover { opacity: 0.85; }
-.svc-num { font-family: var(--ff-h); font-size: 0.62rem; font-weight: 800; color: var(--pink); letter-spacing: 0.08em; min-width: 26px; padding-top: 3px; }
-.svc-d p { font-size: 0.82rem; color: var(--muted); line-height: 1.72; }
+        .sv-menu {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.05);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+        }
 
-/* ── ASIDE BOX ── */
-.aside-box { position: sticky; top: 80px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); }
-.aside-label { font-family: var(--ff-s); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted2); margin-bottom: 1rem; }
-.model-item { background: #fff; border-radius: 6px; padding: 0.9rem 1rem; margin-bottom: 0.65rem; border-left: 3px solid var(--pink); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
-.model-item.blue { border-left-color: var(--blue); }
-.model-item.gray { border-left-color: var(--muted2); }
-.model-nm { font-family: var(--ff-s); font-size: 0.85rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.15rem; }
-.model-st { font-size: 0.68rem; color: var(--muted); }
+        /* HERO */
 
-/* ── VESTING ── */
-.vest3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; }
-.vc { background: #fff; padding: 1.1rem 1rem; }
-.vpc { font-family: var(--ff-h); font-size: 1.5rem; font-weight: 900; color: var(--pink); margin-bottom: 0.25rem; }
-.vc:nth-child(2) { background: var(--bg2); }
-.vc:nth-child(2) .vpc { color: var(--blue); }
-.vl { font-family: var(--ff-s); font-size: 0.72rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--dark2); }
-.vt { font-size: 0.7rem; color: var(--muted); line-height: 1.5; }
+        .sv-hero {
+          min-height: 100vh;
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding: 155px 7vw 100px;
+          overflow: hidden;
+        }
 
-/* ── MARKET CARDS ── */
-.mkt-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.mkt-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.mkt-f { font-family: var(--ff-h); font-size: 2.2rem; font-weight: 900; color: var(--pink); margin-bottom: 0.2rem; }
-.mkt-r { font-family: var(--ff-b); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted2); margin-bottom: 1rem; }
-.mkt-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+        .sv-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            );
+          background-size: 60px 60px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent
+          );
+        }
 
-/* ── PRODUCT CARDS ── */
-.prod-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2.5rem; display: grid; grid-template-columns: 1fr 280px; gap: 2.5rem; align-items: start; margin-bottom: 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.prod-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
-.prod-card.featured { border-top: 3px solid var(--pink); }
-.pname { font-family: var(--ff-h); font-size: 1.4rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.35rem; letter-spacing: -0.01em; }
-.ptag { font-family: var(--ff-b); font-size: 0.72rem; color: var(--muted); margin-bottom: 0.9rem; line-height: 1.6; }
-.pdesc { font-size: 0.85rem; color: var(--muted); line-height: 1.82; margin-bottom: 1.25rem; }
-.pfeats { display: flex; flex-direction: column; gap: 0.45rem; }
-.pf { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
-.pf::before { content: '›'; color: var(--pink); font-weight: 700; font-size: 1rem; flex-shrink: 0; line-height: 1.4; }
-.pasides { display: flex; flex-direction: column; gap: 0.85rem; }
-.pa { background: var(--bg2); border-radius: 6px; padding: 1rem; }
-.pal { font-family: var(--ff-b); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted2); margin-bottom: 0.55rem; }
-.pat { display: inline-block; font-family: var(--ff-b); font-size: 0.62rem; padding: 0.18rem 0.55rem; border: 1px solid var(--border); border-radius: 15px; color: var(--muted); margin: 0.15rem; background: #fff; }
-.status-live { display: flex; align-items: center; gap: 0.35rem; font-family: var(--ff-b); font-size: 0.68rem; font-weight: 600; color: #1a8a55; }
-.status-dev { display: flex; align-items: center; gap: 0.35rem; font-family: var(--ff-b); font-size: 0.68rem; color: var(--muted); }
-.sdot { width: 7px; height: 7px; border-radius: 50%; background: #1a8a55; animation: pulse 2s infinite; flex-shrink: 0; }
-.sdot.d { background: var(--blue); animation: none; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.35} }
+        .sv-glow {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          border-radius: 50%;
+          filter: blur(110px);
+          opacity: .23;
+        }
 
-/* ── TEAM CARDS ── */
-.team-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-.team-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2.25rem 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; position: relative; overflow: hidden; }
-.team-card:hover { transform: translateY(-5px); box-shadow: var(--shadow2); }
-.team-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--grad2); }
-.tc-av { width: 68px; height: 68px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; border: 2px solid var(--pink-light); box-shadow: 0 4px 14px rgba(240,25,101,0.15); }
-.tc-init { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 900; color: var(--pink); letter-spacing: -0.02em; }
-.tc-name { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.2rem; letter-spacing: -0.01em; line-height: 1.25; }
-.tc-title { font-family: var(--ff-b); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--pink); margin-bottom: 0.1rem; }
-.tc-org { font-family: var(--ff-b); font-size: 0.68rem; color: var(--muted2); margin-bottom: 1.1rem; }
-.tc-bio { font-size: 0.8rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.1rem; }
-.tc-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.1rem; }
-.tc-career { border-top: 1px solid var(--border); padding-top: 1.1rem; }
-.ci { display: flex; gap: 0.65rem; margin-bottom: 0.55rem; }
-.ci:last-child { margin-bottom: 0; }
-.ci-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink); flex-shrink: 0; margin-top: 6px; }
-.ci-role { font-size: 0.76rem; font-weight: 600; color: var(--dark2); line-height: 1.3; }
-.ci-co { font-size: 0.68rem; color: var(--muted); margin-top: 0.1rem; }
-.tc-link { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--ff-b); font-size: 0.65rem; font-weight: 600; color: var(--blue); border: 1px solid rgba(2,159,231,0.25); border-radius: 20px; padding: 0.28rem 0.7rem; transition: background .2s; margin-top: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.tc-link:hover { background: var(--blue-light); }
+        .sv-glow-one {
+          left: -190px;
+          top: 70px;
+          background: #f01965;
+          animation: svGlow 8s ease-in-out infinite alternate;
+        }
 
-/* ── ECO BANDS ── */
-.eco-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.eco { display: flex; gap: 1.5rem; padding: 1.6rem 2rem; border-bottom: 1px solid var(--border); background: #fff; transition: background .2s; }
-.eco:last-child { border-bottom: none; }
-.eco:hover { background: var(--bg2); }
-.eco-i { font-size: 1.1rem; flex-shrink: 0; width: 28px; margin-top: 2px; text-align: center; }
-.eco-b p { font-size: 0.83rem; color: var(--muted); line-height: 1.72; max-width: 560px; }
-.eco-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
-.eco-tag { font-size: 0.65rem; padding: 0.18rem 0.6rem; border: 1px solid var(--border); border-radius: 15px; color: var(--muted); background: var(--bg2); font-family: var(--ff-b); font-weight: 500; }
+        .sv-glow-two {
+          right: -180px;
+          bottom: -50px;
+          background: #029fe7;
+          animation: svGlow 10s ease-in-out infinite alternate-reverse;
+        }
 
-/* ── TIER CARDS ── */
-.tier-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.75rem; }
-.tier { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; transition: transform .25s, box-shadow .25s; }
-.tier:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.tier.feat { border-color: var(--pink); border-top: 3px solid var(--pink); }
-.tier.feat::after { content: 'Most Common'; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); font-family: var(--ff-b); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 0.2rem 0.7rem; border-radius: 0 0 6px 6px; }
-.tier-stage { font-family: var(--ff-b); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.4rem; }
-.tier-name { font-family: var(--ff-h); font-size: 1rem; font-weight: 800; color: var(--dark2); margin-bottom: 1rem; }
-.tier-feats { flex: 1; display: flex; flex-direction: column; gap: 0.45rem; }
-.tier-feat { display: flex; align-items: flex-start; gap: 0.45rem; font-size: 0.76rem; color: var(--muted); }
-.tier-feat::before { content: '›'; color: var(--pink); font-weight: 700; font-size: 0.95rem; flex-shrink: 0; line-height: 1.4; }
+        @keyframes svGlow {
+          to {
+            transform: translate(80px,-40px) scale(1.2);
+          }
+        }
 
-/* ── CTA SECTION ── */
-.cta-sec { background: var(--dark2); padding: 6rem 3rem; text-align: center; position: relative; overflow: hidden; }
-.cta-sec::before { content: ''; position: absolute; inset: 0; background: var(--grad); opacity: 0.08; }
-.cta-sec h2 { color: #fff; max-width: 560px; margin: 0 auto 1rem; }
-.cta-sec h2 .accent { color: var(--pink); }
-.cta-sec p { color: rgba(255,255,255,0.65); max-width: 440px; margin: 0 auto 2.5rem; font-size: 0.95rem; }
-.cta-acts { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.cta-note { margin-top: 1.5rem; font-size: 0.72rem; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; font-family: var(--ff-b); }
+        .sv-hero-inner {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 1240px;
+          margin: auto;
+          display: grid;
+          grid-template-columns: 1.1fr .9fr;
+          gap: 70px;
+          align-items: center;
+        }
 
-/* ── FOOTER ── */
-footer { background: #111; color: rgba(255,255,255,0.7); padding: 2.5rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-.f-brand { font-family: var(--ff-h); font-size: 1.1rem; font-weight: 800; color: #fff; }
-.f-brand span { color: var(--pink); }
-.f-links { display: flex; gap: 1.5rem; }
-.f-links a { font-family: var(--ff-b); font-size: 0.72rem; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; transition: color .2s; }
-.f-links a:hover { color: var(--pink); }
-.f-meta { font-family: var(--ff-b); font-size: 0.68rem; color: rgba(255,255,255,0.35); }
+        .sv-label {
+          display: inline-flex;
+          padding: 8px 13px;
+          border: 1px solid rgba(255,255,255,.13);
+          border-radius: 100px;
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.68);
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+        }
 
-/* ── INSIGHTS ── */
-.feat-post { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 2.5rem; box-shadow: var(--shadow); cursor: pointer; transition: box-shadow .25s, transform .25s; }
-.feat-post:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
-.feat-img { background: var(--grad); min-height: 280px; display: flex; align-items: center; justify-content: center; font-size: 52px; }
-.feat-body { padding: 2.5rem; background: #fff; display: flex; flex-direction: column; justify-content: space-between; }
-.post-cat { font-family: var(--ff-b); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.75rem; }
-.post-title { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 800; color: var(--dark2); line-height: 1.3; margin-bottom: 0.75rem; }
-.post-exc { font-size: 0.83rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.25rem; }
-.post-meta { font-size: 0.72rem; color: var(--muted2); display: flex; gap: 0.65rem; }
-.post-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.75rem; }
-.post-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.post-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.pcimg { height: 140px; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 36px; }
-.pcb { padding: 1.25rem; }
-.pcb .post-title { font-size: 0.92rem; margin-bottom: 0.4rem; }
-.pcb .post-exc { font-size: 0.78rem; margin-bottom: 0.7rem; }
-.fbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-.fbtn { font-family: var(--ff-b); font-size: 0.72rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 20px; border: 2px solid var(--border); color: var(--muted); background: transparent; cursor: pointer; transition: all .2s; }
-.fbtn:hover, .fbtn.on { border-color: var(--pink); color: var(--pink); background: var(--pink-light); }
-.nl-strip { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; box-shadow: var(--shadow); }
-.nl-strip h3 { font-family: var(--ff-h); font-size: 1.1rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.3rem; }
-.nl-strip p { font-size: 0.83rem; color: var(--muted); max-width: 380px; }
-.nlf { display: flex; gap: 0.6rem; }
-.nli { font-family: var(--ff-b); font-size: 0.85rem; padding: 0.7rem 1.1rem; background: #fff; border: 2px solid var(--border); border-radius: 30px; color: var(--dark); min-width: 210px; outline: none; transition: border-color .2s; }
-.nli:focus { border-color: var(--pink); }
-.nli::placeholder { color: var(--muted2); }
+        .sv-hero h1 {
+          margin: 25px 0 0;
+          font-size: clamp(52px, 7vw, 96px);
+          line-height: .92;
+          letter-spacing: -5px;
+          font-weight: 900;
+        }
 
-/* ── PODCAST ── */
-.pod-hero { background: var(--dark2); padding: 5.5rem 3rem 3.5rem; position: relative; overflow: hidden; }
-.pod-hero::before { content: ''; position: absolute; inset: 0; background: var(--grad); opacity: 0.12; }
-.pod-hero > * { position: relative; z-index: 2; }
-.pod-hero h1 { color: #fff; font-size: clamp(2rem,4vw,3.5rem); margin-bottom: 1rem; }
-.pod-hero p { color: rgba(255,255,255,0.65); }
-.pod-logo { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2rem; }
-.pod-ic { width: 56px; height: 56px; background: var(--pink); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 6px 20px rgba(240,25,101,0.4); }
-.pod-br { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pink); }
-.plats { display: flex; gap: 0.55rem; flex-wrap: wrap; margin-top: 2rem; }
-.plat { display: flex; align-items: center; gap: 0.4rem; font-family: var(--ff-b); font-size: 0.75rem; font-weight: 600; padding: 0.45rem 1rem; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; color: rgba(255,255,255,0.75); cursor: pointer; transition: all .2s; }
-.plat:hover { border-color: var(--pink); color: var(--pink); }
-.fmt-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.75rem; }
-.fmt-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.fmt-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-top: 3px solid var(--pink); }
-.fmt-i { font-size: 1.3rem; margin-bottom: 0.9rem; }
-.fmt-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.72; }
-.ep-list { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.ep { background: #fff; padding: 1.6rem 2rem; display: grid; grid-template-columns: 56px 1fr auto; gap: 1.25rem; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .2s; }
-.ep:last-child { border-bottom: none; }
-.ep:hover { background: var(--bg2); }
-.ep-nw { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
-.ep-n { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; color: var(--pink); letter-spacing: 0.06em; }
-.ep-pl { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--pink); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; color: var(--pink); transition: all .2s; }
-.ep:hover .ep-pl { background: var(--pink); color: #fff; }
-.ep-tg { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.28rem; }
-.ep-ti { font-family: var(--ff-s); font-size: 0.95rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.28rem; }
-.ep-de { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
-.ep-in { text-align: right; }
-.ep-du { font-size: 0.73rem; color: var(--muted2); }
-.ep-da { font-size: 0.68rem; color: var(--muted2); margin-top: 0.18rem; }
-.ep-new { display: inline-block; font-family: var(--ff-b); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 0.12rem 0.45rem; border-radius: 10px; margin-top: 0.3rem; }
+        .sv-gradient {
+          background:
+            linear-gradient(
+              100deg,
+              #f01965,
+              #ff4e8b,
+              #029fe7
+            );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: svGradient 5s linear infinite;
+        }
 
-@media (max-width: 900px) {
-  section { padding: 4rem 1.5rem; }
-  nav { padding: 0.9rem 1.5rem; }
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; min-height: auto; }
-  .hero-visual { display: none; }
-  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
-  .svc-wrap { grid-template-columns: 1fr; }
-  .aside-box { position: static; }
-  .tier-grid { grid-template-columns: 1fr 1fr; }
-  .team-grid { grid-template-columns: 1fr 1fr; }
-  .prod-card { grid-template-columns: 1fr; }
-  .feat-post { grid-template-columns: 1fr; }
-  .post-grid { grid-template-columns: 1fr 1fr; }
-  footer { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
-  .cta-sec { padding: 4rem 1.5rem; }
-}
+        @keyframes svGradient {
+          to {
+            background-position: 200% center;
+          }
+        }
 
-.page-hero { padding: 10rem 4rem 5rem; background: var(--surface); position: relative; overflow: hidden; }
-    .page-hero-glow { position: absolute; width: 600px; height: 400px; background: radial-gradient(circle, rgba(0,200,255,0.06) 0%, transparent 70%); top: 0; right: 0; pointer-events: none; }
+        .sv-hero-copy {
+          max-width: 670px;
+          margin-top: 30px;
+          color: rgba(255,255,255,.61);
+          line-height: 1.85;
+          font-size: 16px;
+        }
 
-    /* Service cards */
-    .service-full { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-    .svc-row { display: grid; grid-template-columns: 80px 1fr 1fr; background: var(--surface); padding: 2.5rem; gap: 3rem; align-items: start; transition: background var(--transition); }
-    .svc-row:hover { background: var(--card); }
-    .svc-num { font-family: var(--ff-display); font-size: 2.5rem; font-weight: 800; color: rgba(0,200,255,0.15); line-height: 1; padding-top: 4px; }
-    .svc-main h3 { margin-bottom: 0.75rem; }
-    .svc-main p { font-size: 0.9rem; color: var(--muted); line-height: 1.75; }
-    .svc-detail { display: flex; flex-direction: column; gap: 0.5rem; }
-    .svc-tag { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
-    .svc-tag::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+        .sv-actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-top: 33px;
+        }
 
-    /* Engagement models */
-    .model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    .model-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 2rem; transition: border-color var(--transition); }
-    .model-card:hover { border-color: rgba(0,200,255,0.3); }
-    .model-card.featured { border-color: rgba(0,200,255,0.4); position: relative; }
-    .model-card.featured::after { content: 'Most Common'; position: absolute; top: 1rem; right: 1rem; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; background: var(--accent); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 2px; }
-    .model-stage { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
-    .model-name { font-family: var(--ff-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem; }
-    .model-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
-    .model-features { display: flex; flex-direction: column; gap: 0.4rem; }
-    .model-feature { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
-    .model-feature::before { content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+        .sv-primary,
+        .sv-secondary {
+          padding: 15px 22px;
+          border-radius: 14px;
+          font-weight: 800;
+          transition: .3s ease;
+        }
 
-    /* Vesting */
-    .vesting-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-    .vesting-step { background: var(--surface); padding: 2rem; }
-    .vesting-pct { font-family: var(--ff-display); font-size: 2.5rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem; }
-    .vesting-label { font-size: 0.8rem; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; }
-    .vesting-trigger { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
-  
-.nav-in{max-width:1140px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:68px}
-nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid #e2e8f0;box-shadow:0 1px 16px rgba(0,0,0,.06)}
-.logo{font-family:'Raleway',sans-serif;font-size:1.35rem;font-weight:900;color:#111;letter-spacing:-.02em}.logo span{color:#f01965}
-.nav-links{display:flex;gap:.15rem;list-style:none}
-.nav-links a{font-size:.78rem;font-weight:600;color:#444;padding:.45rem .8rem;border-radius:5px;transition:color .2s,background .2s;text-decoration:none}
-.nav-links a:hover,.nav-links a.on{color:#f01965;background:rgba(240,25,101,.06)}
-.btn-talk{font-family:'Open Sans',sans-serif;font-size:.78rem;font-weight:700;padding:.55rem 1.4rem;background:#111;color:white;border:none;border-radius:6px;cursor:pointer;transition:background .2s}
-.btn-talk:hover{background:#f01965}
-.f-in{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.f-brand{font-family:'Raleway',sans-serif;font-size:1.05rem;font-weight:900;color:white}.f-brand span{color:#f01965}
-.f-links{display:flex;gap:1.5rem;flex-wrap:wrap}.f-links a{font-size:.75rem;color:rgba(255,255,255,.45);transition:color .2s;text-decoration:none}.f-links a:hover{color:#f01965}
-.f-meta{font-size:.72rem}`}</style>
-<nav>
-  <div className="nav-in">
-    <a href="/" className="logo">Code<span>Cap</span></a>
-    <ul className="nav-links">
-      <li><a href="/venture-studio">Venture Studio</a></li>
-      <li><a href="/services">Services</a></li>
-      <li><a href="/products">Products</a></li>
-      <li><a href="/portfolio">Portfolio</a></li>
-      <li><a href="/team">Team</a></li>
-      <li><a href="/insights">Insights</a></li>
-      <li><a href="/podcast">Podcast</a></li>
-    </ul>
-    <button className="btn-talk" onClick={() => (window.location.href = "mailto:hello@codecap.ai")}>Talk to us</button>
-  </div>
-</nav>
+        .sv-primary {
+          color: #08090d;
+          background: #fff;
+        }
 
-<section className="page-hero">
-  <div className="page-hero-glow"></div>
-  <div style={{position: "relative", zIndex: "2", maxWidth: "800px"}}>
-    <div className="eyebrow">Studio Services</div>
-    <h1 style={{fontSize: "clamp(2.5rem,5vw,4rem)"}}>Everything a founder needs.<br />Nothing they don't.</h1>
-    <p style={{fontSize: "1.1rem", color: "var(--muted)", maxWidth: "580px", marginTop: "1.5rem", lineHeight: "1.8"}}>Our engagement model is calibrated to startup stage — highest support at the earliest stages, structured to de-risk on both sides as you grow. We are operators, not advisors.</p>
-  </div>
-</section>
+        .sv-secondary {
+          color: #fff;
+          border: 1px solid rgba(255,255,255,.15);
+          background: rgba(255,255,255,.04);
+        }
 
-{/* SERVICES LIST */}
-<section style={{background: "var(--bg)"}}>
-  <div className="eyebrow reveal">What We Do</div>
-  <h2 className="reveal" style={{marginBottom: "3rem"}}>Six core services.<br />Delivered with ownership.</h2>
-  <div className="service-full reveal">
+        .sv-primary:hover,
+        .sv-secondary:hover {
+          transform: translateY(-4px);
+        }
 
-    <div className="svc-row">
-      <div className="svc-num">01</div>
-      <div className="svc-main">
-        <h3>Venture Building & Co-founding</h3>
-        <p>At the pre-idea stage, we function as operational co-founders — shaping the problem space, validating the market thesis, and structuring the foundational product. We don't consult on this. We build it with you, equity-first, milestone-vested, with full accountability for outcomes.</p>
+        /* HERO 3D */
+
+        .sv-visual {
+          min-height: 520px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          perspective: 1200px;
+        }
+
+        .sv-ring {
+          position: absolute;
+          width: 400px;
+          height: 400px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,.1);
+          transform: rotateX(65deg);
+          animation: svRing 12s linear infinite;
+        }
+
+        .sv-ring::before,
+        .sv-ring::after {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+        }
+
+        .sv-ring::before {
+          left: 55px;
+          top: 35px;
+          background: #f01965;
+          box-shadow: 0 0 25px #f01965;
+        }
+
+        .sv-ring::after {
+          right: 55px;
+          bottom: 35px;
+          background: #029fe7;
+          box-shadow: 0 0 25px #029fe7;
+        }
+
+        @keyframes svRing {
+          to {
+            transform:
+              rotateX(65deg)
+              rotateZ(360deg);
+          }
+        }
+
+        .sv-dashboard {
+          width: 350px;
+          min-height: 330px;
+          padding: 25px;
+          border-radius: 28px;
+          border: 1px solid rgba(255,255,255,.15);
+          background:
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.1),
+              rgba(255,255,255,.025)
+            );
+          backdrop-filter: blur(18px);
+          box-shadow:
+            0 50px 100px rgba(0,0,0,.55),
+            inset 0 1px 0 rgba(255,255,255,.1);
+          transform:
+            rotateX(10deg)
+            rotateY(-12deg);
+          animation: svDashboard 5s ease-in-out infinite;
+        }
+
+        @keyframes svDashboard {
+          50% {
+            transform:
+              translateY(-16px)
+              rotateX(13deg)
+              rotateY(-17deg);
+          }
+        }
+
+        .sv-dots {
+          display: flex;
+          gap: 6px;
+        }
+
+        .sv-dots span {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(255,255,255,.25);
+        }
+
+        .sv-dash-title {
+          margin-top: 28px;
+          font-size: 12px;
+          color: rgba(255,255,255,.45);
+          text-transform: uppercase;
+          letter-spacing: .12em;
+        }
+
+        .sv-dash-main {
+          margin-top: 10px;
+          font-size: 42px;
+          font-weight: 900;
+        }
+
+        .sv-dash-chart {
+          height: 100px;
+          margin-top: 25px;
+          display: flex;
+          align-items: end;
+          gap: 8px;
+        }
+
+        .sv-dash-chart span {
+          flex: 1;
+          border-radius: 8px 8px 2px 2px;
+          background:
+            linear-gradient(
+              to top,
+              #f01965,
+              #029fe7
+            );
+          animation: svBars 2.5s ease-in-out infinite alternate;
+        }
+
+        .sv-dash-chart span:nth-child(1) {
+          height: 35%;
+        }
+
+        .sv-dash-chart span:nth-child(2) {
+          height: 55%;
+          animation-delay: .2s;
+        }
+
+        .sv-dash-chart span:nth-child(3) {
+          height: 43%;
+          animation-delay: .4s;
+        }
+
+        .sv-dash-chart span:nth-child(4) {
+          height: 75%;
+          animation-delay: .6s;
+        }
+
+        .sv-dash-chart span:nth-child(5) {
+          height: 90%;
+          animation-delay: .8s;
+        }
+
+        .sv-dash-chart span:nth-child(6) {
+          height: 70%;
+          animation-delay: 1s;
+        }
+
+        @keyframes svBars {
+          to {
+            transform: scaleY(.7);
+          }
+        }
+
+        .sv-floating {
+          position: absolute;
+          padding: 14px 17px;
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 17px;
+          background: rgba(255,255,255,.07);
+          backdrop-filter: blur(15px);
+          box-shadow: 0 25px 55px rgba(0,0,0,.35);
+          animation: svFloat 5s ease-in-out infinite;
+        }
+
+        .sv-floating strong {
+          display: block;
+          font-size: 18px;
+        }
+
+        .sv-floating small {
+          color: rgba(255,255,255,.45);
+        }
+
+        .sv-floating-one {
+          top: 55px;
+          right: 0;
+        }
+
+        .sv-floating-two {
+          left: 0;
+          bottom: 70px;
+          animation-delay: -2s;
+        }
+
+        .sv-floating-three {
+          right: 25px;
+          bottom: 15px;
+          animation-delay: -3.5s;
+        }
+
+        @keyframes svFloat {
+          50% {
+            transform: translateY(-17px) rotateZ(2deg);
+          }
+        }
+
+        /* COMMON */
+
+        .sv-section {
+          padding: 125px 7vw;
+        }
+
+        .sv-container {
+          max-width: 1180px;
+          margin: auto;
+        }
+
+        .sv-section-label {
+          color: #f01965;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+          margin-bottom: 17px;
+        }
+
+        .sv-title {
+          margin: 0;
+          font-size: clamp(42px,5vw,73px);
+          line-height: .98;
+          letter-spacing: -3px;
+        }
+
+        .sv-title span {
+          color: rgba(255,255,255,.3);
+        }
+
+        /* SERVICE SELECTOR */
+
+        .sv-service-area {
+          margin-top: 65px;
+          display: grid;
+          grid-template-columns: .7fr 1.3fr;
+          gap: 22px;
+        }
+
+        .sv-service-list {
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+        }
+
+        .sv-service-button {
+          width: 100%;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.035);
+          color: rgba(255,255,255,.65);
+          padding: 18px;
+          border-radius: 15px;
+          text-align: left;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          transition: .3s ease;
+        }
+
+        .sv-service-button:hover {
+          transform: translateX(5px);
+          color: #fff;
+        }
+
+        .sv-service-button.active {
+          background:
+            linear-gradient(
+              100deg,
+              rgba(240,25,101,.15),
+              rgba(2,159,231,.07)
+            );
+          border-color: rgba(240,25,101,.4);
+          color: #fff;
+          transform: translateX(8px);
+        }
+
+        .sv-service-button-number {
+          color: #f01965;
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .sv-service-button-title {
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .sv-detail {
+          min-height: 490px;
+          padding: 38px;
+          border-radius: 30px;
+          border: 1px solid rgba(255,255,255,.1);
+          background:
+            radial-gradient(
+              circle at 90% 10%,
+              rgba(240,25,101,.15),
+              transparent 28%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.07),
+              rgba(255,255,255,.025)
+            );
+          position: relative;
+          overflow: hidden;
+        }
+
+        .sv-detail::before {
+          content: "";
+          position: absolute;
+          width: 220px;
+          height: 220px;
+          border-radius: 50%;
+          right: -100px;
+          bottom: -100px;
+          background: #029fe7;
+          filter: blur(70px);
+          opacity: .13;
+        }
+
+        .sv-detail-number {
+          color: #029fe7;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .sv-detail h3 {
+          max-width: 700px;
+          margin: 25px 0 13px;
+          font-size: clamp(30px,4vw,52px);
+          line-height: 1;
+          letter-spacing: -2px;
+        }
+
+        .sv-detail-short {
+          color: #f01965;
+          font-weight: 800;
+          font-size: 14px;
+        }
+
+        .sv-detail-text {
+          max-width: 700px;
+          color: rgba(255,255,255,.55);
+          line-height: 1.8;
+          margin-top: 24px;
+        }
+
+        .sv-best {
+          display: inline-block;
+          margin-top: 20px;
+          padding: 7px 10px;
+          border-radius: 100px;
+          background: rgba(255,255,255,.06);
+          color: rgba(255,255,255,.6);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+        }
+
+        .sv-points {
+          margin: 30px 0 0;
+          padding: 0;
+          list-style: none;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .sv-points li {
+          color: rgba(255,255,255,.62);
+          font-size: 12px;
+          line-height: 1.5;
+          padding: 12px;
+          border-radius: 12px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .sv-points li::before {
+          content: "✦";
+          color: #f01965;
+          margin-right: 8px;
+        }
+
+        /* MODELS */
+
+        .sv-models {
+          background: #f4f5f7;
+          color: #0a0b10;
+        }
+
+        .sv-models .sv-title span {
+          color: #737983;
+        }
+
+        .sv-model-grid {
+          margin-top: 60px;
+          display: grid;
+          grid-template-columns: repeat(4,1fr);
+          gap: 15px;
+        }
+
+        .sv-model {
+          min-height: 280px;
+          padding: 27px;
+          border-radius: 24px;
+          background: #fff;
+          border: 1px solid #e0e3e8;
+          transition: .4s ease;
+        }
+
+        .sv-model:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 30px 70px rgba(0,0,0,.1);
+        }
+
+        .sv-model-number {
+          color: #f01965;
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .sv-model h3 {
+          margin: 60px 0 15px;
+          font-size: 22px;
+          letter-spacing: -.5px;
+        }
+
+        .sv-model p {
+          color: #707681;
+          font-size: 13px;
+          line-height: 1.7;
+        }
+
+        /* VESTING */
+
+        .sv-vesting {
+          margin-top: 70px;
+          display: grid;
+          grid-template-columns: .8fr 1.2fr;
+          gap: 45px;
+          align-items: center;
+        }
+
+        .sv-vesting p {
+          color: #737983;
+          line-height: 1.8;
+        }
+
+        .sv-bars {
+          display: flex;
+          flex-direction: column;
+          gap: 13px;
+        }
+
+        .sv-bar {
+          display: grid;
+          grid-template-columns: 80px 1fr 55px;
+          gap: 15px;
+          align-items: center;
+          padding: 15px;
+          border-radius: 15px;
+          background: #fff;
+          border: 1px solid #e1e3e7;
+        }
+
+        .sv-bar-name {
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .sv-bar-track {
+          height: 8px;
+          background: #e7e8eb;
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        .sv-bar-fill {
+          height: 100%;
+          border-radius: inherit;
+          background:
+            linear-gradient(
+              90deg,
+              #f01965,
+              #029fe7
+            );
+        }
+
+        .sv-bar-percent {
+          font-size: 12px;
+          font-weight: 900;
+          text-align: right;
+        }
+
+        .sv-note {
+          margin-top: 20px;
+          color: #858a92;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+        /* STAGE */
+
+        .sv-stage {
+          background:
+            radial-gradient(
+              circle at 85% 35%,
+              rgba(2,159,231,.1),
+              transparent 30%
+            ),
+            #0c0e14;
+        }
+
+        .sv-stage-grid {
+          margin-top: 60px;
+          display: grid;
+          grid-template-columns: repeat(3,1fr);
+          gap: 18px;
+        }
+
+        .sv-stage-card {
+          min-height: 250px;
+          padding: 28px;
+          border: 1px solid rgba(255,255,255,.1);
+          border-radius: 25px;
+          background: rgba(255,255,255,.04);
+          transition: .4s ease;
+        }
+
+        .sv-stage-card:hover {
+          transform: translateY(-10px);
+          border-color: rgba(2,159,231,.4);
+        }
+
+        .sv-stage-number {
+          color: #029fe7;
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .sv-stage-card h3 {
+          margin: 65px 0 10px;
+          font-size: 25px;
+        }
+
+        .sv-stage-card p {
+          margin: 0;
+          color: rgba(255,255,255,.45);
+          line-height: 1.7;
+          font-size: 13px;
+        }
+
+        /* CTA */
+
+        .sv-cta {
+          padding: 150px 7vw;
+          text-align: center;
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(240,25,101,.15),
+              transparent 40%
+            );
+        }
+
+        .sv-cta h2 {
+          max-width: 900px;
+          margin: auto;
+          font-size: clamp(48px,7vw,92px);
+          line-height: .94;
+          letter-spacing: -5px;
+        }
+
+        .sv-cta p {
+          max-width: 650px;
+          margin: 28px auto 35px;
+          color: rgba(255,255,255,.5);
+          line-height: 1.8;
+        }
+
+        .sv-cta-button {
+          display: inline-flex;
+          padding: 17px 28px;
+          border-radius: 15px;
+          background: #fff;
+          color: #08090d;
+          font-weight: 900;
+          transition: .3s ease;
+        }
+
+        .sv-cta-button:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 60px rgba(255,255,255,.15);
+        }
+
+        /* FOOTER */
+
+        .sv-footer {
+          padding: 35px 7vw;
+          border-top: 1px solid rgba(255,255,255,.08);
+          background: #07080b;
+        }
+
+        .sv-footer-inner {
+          max-width: 1180px;
+          margin: auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .sv-footer-logo {
+          font-size: 23px;
+          font-weight: 900;
+        }
+
+        .sv-footer-logo span {
+          color: #f01965;
+        }
+
+        .sv-footer-text {
+          color: rgba(255,255,255,.4);
+          font-size: 12px;
+          text-align: right;
+        }
+
+        /* REVEAL */
+
+        .sv-reveal {
+          opacity: 0;
+          transform: translateY(45px);
+          transition:
+            opacity .8s ease,
+            transform .8s cubic-bezier(.2,.8,.2,1);
+        }
+
+        .sv-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 1050px) {
+
+          .sv-links,
+          .sv-talk {
+            display: none;
+          }
+
+          .sv-menu {
+            display: block;
+          }
+
+          .sv-hero-inner {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-visual {
+            min-height: 440px;
+          }
+
+          .sv-model-grid {
+            grid-template-columns: repeat(2,1fr);
+          }
+
+        }
+
+        @media (max-width: 760px) {
+
+          .sv-nav {
+            top: 8px;
+            width: calc(100% - 18px);
+            border-radius: 18px;
+          }
+
+          .sv-mobile-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(10,11,17,.97);
+            backdrop-filter: blur(20px);
+          }
+
+          .sv-mobile-menu a {
+            display: block;
+            padding: 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,.72);
+            font-weight: 700;
+          }
+
+          .sv-hero {
+            padding: 130px 20px 70px;
+          }
+
+          .sv-hero h1 {
+            font-size: 53px;
+            letter-spacing: -3px;
+          }
+
+          .sv-hero-copy {
+            font-size: 15px;
+          }
+
+          .sv-visual {
+            min-height: 380px;
+          }
+
+          .sv-dashboard {
+            width: 290px;
+            min-height: 285px;
+          }
+
+          .sv-ring {
+            width: 300px;
+            height: 300px;
+          }
+
+          .sv-floating {
+            padding: 11px 13px;
+          }
+
+          .sv-floating-one {
+            top: 25px;
+            right: 0;
+          }
+
+          .sv-floating-two {
+            left: 0;
+            bottom: 45px;
+          }
+
+          .sv-floating-three {
+            right: 0;
+            bottom: 0;
+          }
+
+          .sv-section {
+            padding: 85px 20px;
+          }
+
+          .sv-title {
+            font-size: 43px;
+            letter-spacing: -2px;
+          }
+
+          .sv-service-area {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-detail {
+            min-height: auto;
+            padding: 27px;
+          }
+
+          .sv-points {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-model-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-model {
+            min-height: 230px;
+          }
+
+          .sv-vesting {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-stage-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .sv-cta {
+            padding: 100px 20px;
+          }
+
+          .sv-cta h2 {
+            font-size: 52px;
+            letter-spacing: -3px;
+          }
+
+          .sv-footer {
+            padding: 28px 20px;
+          }
+
+          .sv-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .sv-footer-text {
+            text-align: left;
+          }
+
+        }
+
+      `}</style>
+
+      <div className="sv-page">
+
+        {/* NAVBAR */}
+
+        <nav className="sv-nav">
+
+          <div className="sv-nav-inner">
+
+            <a href="/" className="sv-logo">
+              Code<span>Cap</span>
+            </a>
+
+            <div className="sv-links">
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a
+                href="/services"
+                className="sv-active"
+              >
+                Services
+              </a>
+
+              <a href="/products">
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+            </div>
+
+            <button
+              className="sv-talk"
+              onClick={() =>
+                (window.location.href =
+                  "mailto:hello@codecap.ai")
+              }
+            >
+              Talk to us
+            </button>
+
+            <button
+              className="sv-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "×" : "☰"}
+            </button>
+
+          </div>
+
+          {menuOpen && (
+            <div className="sv-mobile-menu">
+
+              <a href="/" onClick={() => setMenuOpen(false)}>
+                Home
+              </a>
+
+              <a
+                href="/venture-studio"
+                onClick={() => setMenuOpen(false)}
+              >
+                Venture Studio
+              </a>
+
+              <a
+                href="/services"
+                onClick={() => setMenuOpen(false)}
+              >
+                Services
+              </a>
+
+              <a
+                href="/products"
+                onClick={() => setMenuOpen(false)}
+              >
+                Products
+              </a>
+
+              <a
+                href="/portfolio"
+                onClick={() => setMenuOpen(false)}
+              >
+                Portfolio
+              </a>
+
+              <a
+                href="/team"
+                onClick={() => setMenuOpen(false)}
+              >
+                Team
+              </a>
+
+              <a
+                href="/insights"
+                onClick={() => setMenuOpen(false)}
+              >
+                Insights
+              </a>
+
+              <a
+                href="/podcast"
+                onClick={() => setMenuOpen(false)}
+              >
+                Podcast
+              </a>
+
+              <a
+                href="mailto:hello@codecap.ai"
+                onClick={() => setMenuOpen(false)}
+              >
+                Talk to us →
+              </a>
+
+            </div>
+          )}
+
+        </nav>
+
+        {/* HERO */}
+
+        <section className="sv-hero">
+
+          <div className="sv-grid"></div>
+
+          <div className="sv-glow sv-glow-one"></div>
+          <div className="sv-glow sv-glow-two"></div>
+
+          <div className="sv-hero-inner">
+
+            <div className="sv-reveal">
+
+              <div className="sv-label">
+                CodeCap Services
+              </div>
+
+              <h1>
+                Everything a
+                <br />
+                founder needs.
+                <br />
+                <span className="sv-gradient">
+                  Nothing they don't.
+                </span>
+              </h1>
+
+              <p className="sv-hero-copy">
+                Our engagement model is calibrated to startup
+                stage — highest support at the earliest stages,
+                structured to de-risk on both sides as you grow.
+                We are operators, not advisors.
+              </p>
+
+              <div className="sv-actions">
+
+                <a
+                  href="#services"
+                  className="sv-primary"
+                >
+                  Explore Services →
+                </a>
+
+                <a
+                  href="mailto:hello@codecap.ai"
+                  className="sv-secondary"
+                >
+                  Talk to us
+                </a>
+
+              </div>
+
+            </div>
+
+            <div className="sv-visual sv-reveal">
+
+              <div className="sv-ring"></div>
+
+              <div className="sv-dashboard">
+
+                <div className="sv-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <div className="sv-dash-title">
+                  Founder Operating System
+                </div>
+
+                <div className="sv-dash-main">
+                  BUILD → SELL → SCALE
+                </div>
+
+                <div className="sv-dash-chart">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+              </div>
+
+              <div className="sv-floating sv-floating-one">
+                <strong>BUILD</strong>
+                <small>Product</small>
+              </div>
+
+              <div className="sv-floating sv-floating-two">
+                <strong>GTM</strong>
+                <small>Sales</small>
+              </div>
+
+              <div className="sv-floating sv-floating-three">
+                <strong>GROW</strong>
+                <small>Markets</small>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* SERVICES */}
+
+        <section
+          className="sv-section"
+          id="services"
+        >
+
+          <div className="sv-container">
+
+            <div className="sv-reveal">
+
+              <div className="sv-section-label">
+                Six Capabilities
+              </div>
+
+              <h2 className="sv-title">
+                Pick the gap.
+                <br />
+                <span>We'll help close it.</span>
+              </h2>
+
+            </div>
+
+            <div className="sv-service-area">
+
+              <div className="sv-service-list sv-reveal">
+
+                {services.map((service, index) => (
+                  <button
+                    key={service.number}
+                    className={
+                      activeService === index
+                        ? "sv-service-button active"
+                        : "sv-service-button"
+                    }
+                    onClick={() =>
+                      setActiveService(index)
+                    }
+                  >
+
+                    <span className="sv-service-button-number">
+                      {service.number}
+                    </span>
+
+                    <span className="sv-service-button-title">
+                      {service.title}
+                    </span>
+
+                  </button>
+                ))}
+
+              </div>
+
+              <div className="sv-detail sv-reveal">
+
+                <div className="sv-detail-number">
+                  SERVICE / {services[activeService].number}
+                </div>
+
+                <h3>
+                  {services[activeService].title}
+                </h3>
+
+                <div className="sv-detail-short">
+                  {services[activeService].short}
+                </div>
+
+                <p className="sv-detail-text">
+                  {services[activeService].detail}
+                </p>
+
+                <div className="sv-best">
+                  Best for: {services[activeService].best}
+                </div>
+
+                <ul className="sv-points">
+
+                  {services[activeService].points.map(
+                    (point, index) => (
+                      <li key={index}>
+                        {point}
+                      </li>
+                    )
+                  )}
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ENGAGEMENT MODELS */}
+
+        <section className="sv-section sv-models">
+
+          <div className="sv-container">
+
+            <div className="sv-reveal">
+
+              <div className="sv-section-label">
+                Engagement Models
+              </div>
+
+              <h2 className="sv-title">
+                One studio.
+                <br />
+                <span>Different ways to work.</span>
+              </h2>
+
+            </div>
+
+            <div className="sv-model-grid">
+
+              {models.map((model, index) => (
+                <div
+                  className="sv-model sv-reveal"
+                  key={model.title}
+                >
+
+                  <div className="sv-model-number">
+                    0{index + 1}
+                  </div>
+
+                  <h3>
+                    {model.title}
+                  </h3>
+
+                  <p>
+                    {model.text}
+                  </p>
+
+                </div>
+              ))}
+
+            </div>
+
+            {/* VESTING */}
+
+            <div className="sv-vesting">
+
+              <div className="sv-reveal">
+
+                <div className="sv-section-label">
+                  Milestone Vesting
+                </div>
+
+                <h2 className="sv-title">
+                  Equity follows
+                  <br />
+                  <span>execution.</span>
+                </h2>
+
+                <p>
+                  Our milestone structure aligns incentives
+                  around measurable progress and actual
+                  company-building work.
+                </p>
+
+                <div className="sv-note">
+                  12-month clawback on unvested tranches.
+                  Singapore/DIFC-seated legal structuring.
+                </div>
+
+              </div>
+
+              <div className="sv-bars sv-reveal">
+
+                <div className="sv-bar">
+
+                  <div className="sv-bar-name">
+                    Strategy
+                  </div>
+
+                  <div className="sv-bar-track">
+                    <div
+                      className="sv-bar-fill"
+                      style={{ width: "30%" }}
+                    ></div>
+                  </div>
+
+                  <div className="sv-bar-percent">
+                    30%
+                  </div>
+
+                </div>
+
+                <div className="sv-bar">
+
+                  <div className="sv-bar-name">
+                    Product
+                  </div>
+
+                  <div className="sv-bar-track">
+                    <div
+                      className="sv-bar-fill"
+                      style={{ width: "40%" }}
+                    ></div>
+                  </div>
+
+                  <div className="sv-bar-percent">
+                    40%
+                  </div>
+
+                </div>
+
+                <div className="sv-bar">
+
+                  <div className="sv-bar-name">
+                    Traction
+                  </div>
+
+                  <div className="sv-bar-track">
+                    <div
+                      className="sv-bar-fill"
+                      style={{ width: "30%" }}
+                    ></div>
+                  </div>
+
+                  <div className="sv-bar-percent">
+                    30%
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* STAGES */}
+
+        <section className="sv-section sv-stage">
+
+          <div className="sv-container">
+
+            <div className="sv-reveal">
+
+              <div className="sv-section-label">
+                Startup Stage
+              </div>
+
+              <h2 className="sv-title">
+                The earlier we join,
+                <br />
+                <span>the deeper we operate.</span>
+              </h2>
+
+            </div>
+
+            <div className="sv-stage-grid">
+
+              <div className="sv-stage-card sv-reveal">
+
+                <div className="sv-stage-number">
+                  PRE-IDEA
+                </div>
+
+                <h3>
+                  Find the problem.
+                </h3>
+
+                <p>
+                  Shape the problem space, validate the market
+                  thesis and establish the foundation.
+                </p>
+
+              </div>
+
+              <div className="sv-stage-card sv-reveal">
+
+                <div className="sv-stage-number">
+                  MVP
+                </div>
+
+                <h3>
+                  Build the product.
+                </h3>
+
+                <p>
+                  Turn the idea into something real that
+                  customers can actually use.
+                </p>
+
+              </div>
+
+              <div className="sv-stage-card sv-reveal">
+
+                <div className="sv-stage-number">
+                  GROWTH
+                </div>
+
+                <h3>
+                  Build traction.
+                </h3>
+
+                <p>
+                  Strengthen GTM, sales, funding and regional
+                  expansion capabilities.
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* FINAL CTA */}
+
+        <section className="sv-cta">
+
+          <div className="sv-reveal">
+
+            <div className="sv-section-label">
+              Let's Work
+            </div>
+
+            <h2>
+              Not sure which
+              <br />
+              model fits?
+            </h2>
+
+            <p>
+              Tell us where you are, what you're building and
+              where you need help. We'll tell you which model
+              makes sense.
+            </p>
+
+            <a
+              href="mailto:hello@codecap.ai"
+              className="sv-cta-button"
+            >
+              Talk to CodeCap →
+            </a>
+
+          </div>
+
+        </section>
+
+        {/* FOOTER */}
+
+        <footer className="sv-footer">
+
+          <div className="sv-footer-inner">
+
+            <div className="sv-footer-logo">
+              Code<span>Cap</span>
+            </div>
+
+            <div className="sv-footer-text">
+              © 2025 CodeCap Ventures · Singapore · UAE · India
+              <br />
+              hello@codecap.ai
+            </div>
+
+          </div>
+
+        </footer>
+
       </div>
-      <div className="svc-detail">
-        <div className="svc-tag">Problem framing & market validation</div>
-        <div className="svc-tag">Founding team structuring</div>
-        <div className="svc-tag">Entity setup & legal scaffolding</div>
-        <div className="svc-tag">Product roadmap & prioritisation</div>
-        <div className="svc-tag">Investor readiness from day one</div>
-        <span className="pill pill-accent" style={{marginTop: "0.5rem"}}>Best for: Pre-idea founders</span>
-      </div>
-    </div>
-
-    <div className="svc-row">
-      <div className="svc-num">02</div>
-      <div className="svc-main">
-        <h3>Product Development & Tech Execution</h3>
-        <p>From MVP architecture to production-grade engineering, our technical team builds alongside yours. We specialise in AI-native products, cybersecurity platforms, and B2B SaaS infrastructure across cloud-native stacks. We've built before — and we know what matters at each stage.</p>
-      </div>
-      <div className="svc-detail">
-        <div className="svc-tag">AI/ML product architecture</div>
-        <div className="svc-tag">Cybersecurity platform development</div>
-        <div className="svc-tag">B2B SaaS infrastructure</div>
-        <div className="svc-tag">Cloud-native stacks (AWS, GCP, Azure)</div>
-        <div className="svc-tag">API integrations & data pipelines</div>
-        <span className="pill pill-green" style={{marginTop: "0.5rem"}}>Best for: Pre-seed to Seed</span>
-      </div>
-    </div>
-
-    <div className="svc-row">
-      <div className="svc-num">03</div>
-      <div className="svc-main">
-        <h3>Go-to-Market Strategy & Sales</h3>
-        <p>We don't hand over a deck and walk away. CodeCap owns the GTM motion — identifying enterprise buyers, building sales decks that convert, running proposals end-to-end, and closing first deals in-market across Singapore, UAE, and India. Our commercial upside is tied directly to deals closed.</p>
-      </div>
-      <div className="svc-detail">
-        <div className="svc-tag">ICP definition & market segmentation</div>
-        <div className="svc-tag">Enterprise pipeline development</div>
-        <div className="svc-tag">Proposal & RFP management</div>
-        <div className="svc-tag">Channel & partner development</div>
-        <div className="svc-tag">Deal closing & negotiation support</div>
-        <span className="pill pill-accent" style={{marginTop: "0.5rem"}}>Best for: MVP to Seed stage</span>
-      </div>
-    </div>
-
-    <div className="svc-row">
-      <div className="svc-num">04</div>
-      <div className="svc-main">
-        <h3>Fundraising Support & VC Introductions</h3>
-        <p>From pitch deck construction to warm VC introductions across SEA, Gulf, and South Asian networks, CodeCap supports your capital raise — structured compliantly under MAS and UAE regulatory frameworks. We don't take fundraising-only mandates — capital support is always bundled with active service delivery.</p>
-      </div>
-      <div className="svc-detail">
-        <div className="svc-tag">Pitch deck development & review</div>
-        <div className="svc-tag">Financial model structuring</div>
-        <div className="svc-tag">VC introductions (SEA, Gulf, India)</div>
-        <div className="svc-tag">Due diligence preparation</div>
-        <div className="svc-tag">MAS & UAE-compliant success structures</div>
-        <span className="pill pill-green" style={{marginTop: "0.5rem"}}>Best for: Pre-seed to Series A</span>
-      </div>
-    </div>
-
-    <div className="svc-row">
-      <div className="svc-num">05</div>
-      <div className="svc-main">
-        <h3>Cyber & Deep Tech Advisory</h3>
-        <p>For startups operating in AI security, threat intelligence, zero-trust architecture, or regulated deep tech, CodeCap provides hands-on subject matter expertise that goes beyond advisory — we implement and validate. Our team has delivered in enterprise security environments across financial services, government, and critical infrastructure.</p>
-      </div>
-      <div className="svc-detail">
-        <div className="svc-tag">AI threat modelling & red-teaming</div>
-        <div className="svc-tag">Threat intelligence platform review</div>
-        <div className="svc-tag">Zero-trust architecture design</div>
-        <div className="svc-tag">Security product GTM</div>
-        <div className="svc-tag">Regulated industry compliance advisory</div>
-        <span className="pill pill-purple" style={{marginTop: "0.5rem"}}>Best for: Cyber & deep tech startups</span>
-      </div>
-    </div>
-
-    <div className="svc-row">
-      <div className="svc-num">06</div>
-      <div className="svc-main">
-        <h3>Regional Market Entry</h3>
-        <p>Structured market entry programs for Singapore, UAE/KSA, and India — including entity setup guidance, regulatory strategy, partner channel development, and on-the-ground BD relationships from day one. We've navigated each of these markets ourselves, and we know what foreign founders get wrong.</p>
-      </div>
-      <div className="svc-detail">
-        <div className="svc-tag">Entity structure & setup guidance</div>
-        <div className="svc-tag">Regulatory & licensing navigation</div>
-        <div className="svc-tag">Local BD network activation</div>
-        <div className="svc-tag">Government & enterprise introductions</div>
-        <div className="svc-tag">Hiring & team localisation</div>
-        <span className="pill pill-accent" style={{marginTop: "0.5rem"}}>Covers: SG · UAE · India</span>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-{/* ENGAGEMENT MODELS */}
-<section style={{background: "var(--surface)"}}>
-  <div className="eyebrow reveal">Engagement Models</div>
-  <h2 className="reveal">Four ways to work with us.</h2>
-  <p className="section-lead reveal">Structured deal templates for every founder situation. Every model is milestone-vested and designed for long-term alignment — not short-term billing.</p>
-  <div className="model-grid reveal">
-    <div className="model-card">
-      <div className="model-stage">Pre-idea · Pre-seed</div>
-      <div className="model-name">Cash-Light Build</div>
-      <div className="model-desc">For founders with strong vision but limited capital. CodeCap takes an equity-first position with milestone vesting, covering full execution across product and GTM. Revenue share activates once the business generates revenue.</div>
-      <div className="model-features">
-        <div className="model-feature">Zero or minimal monthly retainer</div>
-        <div className="model-feature">Equity-first, 3-tranche milestone vesting</div>
-        <div className="model-feature">Revenue share activates at month 6+</div>
-        <div className="model-feature">12-month clawback on unvested equity</div>
-      </div>
-    </div>
-    <div className="model-card featured">
-      <div className="model-stage">Pre-seed · MVP Sweet Spot</div>
-      <div className="model-name">Funded Founder GTM</div>
-      <div className="model-desc">For founders who have raised initial capital and need execution firepower. A retainer covers CodeCap's cost base while equity and revenue share provide long-term upside alignment. Our most common engagement structure.</div>
-      <div className="model-features">
-        <div className="model-feature">Monthly retainer (cost recovery basis)</div>
-        <div className="model-feature">Equity with performance vesting</div>
-        <div className="model-feature">Revenue share on CodeCap-sourced deals</div>
-        <div className="model-feature">6-month minimum commitment</div>
-      </div>
-    </div>
-    <div className="model-card">
-      <div className="model-stage">Pre-idea · Full Build</div>
-      <div className="model-name">Venture Co-Founder</div>
-      <div className="model-desc">For first-time founders building from zero. CodeCap becomes an operational co-founder — taking significant equity across three vesting tranches, running product, GTM, and operations, with a board observer seat included.</div>
-      <div className="model-features">
-        <div className="model-feature">Token monthly fee or zero fees</div>
-        <div className="model-feature">Significant equity, 3-tranche vesting</div>
-        <div className="model-feature">CodeCap operates as co-founder</div>
-        <div className="model-feature">Board observer seat included</div>
-      </div>
-    </div>
-    <div className="model-card">
-      <div className="model-stage">Series A · Selective Only</div>
-      <div className="model-name">Capability Gap</div>
-      <div className="model-desc">For Series A companies with a specific, unfillable gap — typically in cyber/deep tech, Gulf GTM, or SEA market entry. Fees-dominant structure, minimal equity, defined scope with a built-in exit clause. Requires partner-level approval before pitching.</div>
-      <div className="model-features">
-        <div className="model-feature">Retainer-dominant structure</div>
-        <div className="model-feature">Minimal equity component</div>
-        <div className="model-feature">Defined scope + exit clause at 6 months</div>
-        <div className="model-feature">Partner sign-off required · 1 concurrent max</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* VESTING STRUCTURE */}
-<section>
-  <div className="eyebrow reveal">Equity Framework</div>
-  <h2 className="reveal">Milestone vesting.<br />Aligned incentives.</h2>
-  <p className="section-lead reveal">All equity deals follow a standard 3-tranche milestone vesting structure. This protects founders from passive equity holders and ensures CodeCap remains accountable for delivery at every stage.</p>
-  <div className="vesting-steps reveal">
-    <div className="vesting-step">
-      <div className="vesting-pct">30%</div>
-      <div className="vesting-label">Tranche 1 — Strategy & Setup</div>
-      <div className="vesting-trigger">Granted on agreement signing and strategy delivery. Covers setup, problem framing, and roadmap. Trigger: Month 1–2.</div>
-    </div>
-    <div className="vesting-step" style={{background: "var(--card)"}}>
-      <div className="vesting-pct" style={{color: "var(--accent2)"}}>40%</div>
-      <div className="vesting-label">Tranche 2 — Product or First Revenue</div>
-      <div className="vesting-trigger">Granted on product launch or first paying customer. Trigger: MVP live, first closed deal, or pre-seed funding closed.</div>
-    </div>
-    <div className="vesting-step">
-      <div className="vesting-pct">30%</div>
-      <div className="vesting-label">Tranche 3 — Traction or Funding</div>
-      <div className="vesting-trigger">Granted on meaningful traction or a funding milestone. Trigger: ARR milestone, seed round closed, or 18 months post-engagement.</div>
-    </div>
-  </div>
-  <p style={{fontSize: "0.85rem", color: "var(--muted)", marginTop: "1.5rem", lineHeight: "1.7"}}>12-month clawback on unvested tranches if founder terminates without cause. All equity agreements require Singapore or DIFC-seated legal structuring for enforceability.</p>
-</section>
-
-{/* CTA */}
-<section style={{textAlign: "center", borderTop: "1px solid var(--border)", padding: "6rem 4rem", background: "var(--surface)"}}>
-  <div className="eyebrow" style={{justifyContent: "center"}}>Get Started</div>
-  <h2 style={{maxWidth: "600px", margin: "0 auto 1.25rem"}}>Not sure which model fits you?</h2>
-  <p style={{color: "var(--muted)", maxWidth: "480px", margin: "0 auto 2.5rem"}}>Tell us where you are and what you're trying to build. We'll tell you if we're the right partner — and if not, we'll point you in the right direction.</p>
-  <a href="mailto:hello@codecap.ai" className="btn-primary">Talk to the Team</a>
-  <p style={{fontSize: "0.8rem", color: "var(--muted)", marginTop: "1.5rem"}}>hello@codecap.ai · Singapore · UAE · India</p>
-</section>
-
-<footer>
-  <div className="f-in">
-    <div className="f-brand">Code<span>Cap</span></div>
-    <div className="f-links">
-      <a href="/venture-studio">Venture Studio</a><a href="/services">Services</a><a href="/products">Products</a><a href="/portfolio">Portfolio</a><a href="/team">Team</a><a href="/insights">Insights</a><a href="/podcast">Podcast</a>
-    </div>
-    <div className="f-meta">© 2025 CodeCap Ventures · Singapore · UAE · India · hello@codecap.ai</div>
-  </div>
-</footer>
-
-
     </>
   );
 }

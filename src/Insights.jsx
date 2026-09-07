@@ -1,1197 +1,1140 @@
-import { useEffect, useState } from "react";
-import "./styles.css";
+import React, { useEffect, useState } from "react";
 
 function Insights() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
 
   useEffect(() => {
+    const elements = document.querySelectorAll(".in-reveal");
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            entry.target.classList.add("in-visible");
           }
         });
       },
       { threshold: 0.1 }
     );
 
-    document.querySelectorAll(".insights-page .reveal").forEach((el) => {
-      observer.observe(el);
-    });
+    elements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
-  }, []);
+  }, [activeFilter]);
+
+  const posts = [
+    {
+      category: "GTM · Southeast Asia",
+      filter: "GTM & Sales",
+      title:
+        "Why Most AI Startups in SEA Fail at GTM (And What the Survivors Do Differently)",
+      time: "8 min",
+      date: "March 2025",
+    },
+    {
+      category: "Legal · Gulf Markets",
+      filter: "Markets",
+      title:
+        "The DIFC vs ADGM Decision: A Founder's Practical Guide to Gulf Entity Setup",
+      time: "10 min",
+      date: "March 2025",
+    },
+    {
+      category: "Cybersecurity · Venture Build",
+      filter: "AI & Cybersecurity",
+      title:
+        "Building a Threat Intelligence Product from Zero: What We Learned in 12 Months",
+      time: "14 min",
+      date: "February 2025",
+    },
+    {
+      category: "Deal Structure · South Asia",
+      filter: "Fundraising",
+      title:
+        "Why Indian Founders Push Back on Equity — and Why We Changed Our Approach",
+      time: "7 min",
+      date: "February 2025",
+    },
+    {
+      category: "Venture Building · Opinion",
+      filter: "Venture Building",
+      title:
+        "The Venture Studio Model Is Broken. Here's What We're Doing Instead.",
+      time: "9 min",
+      date: "January 2025",
+    },
+    {
+      category: "AI · GTM",
+      filter: "GTM & Sales",
+      title:
+        "AI-Powered Sales Intelligence: The Tools That Are Actually Moving Pipeline in 2025",
+      time: "11 min",
+      date: "January 2025",
+    },
+    {
+      category: "Fundraising · VC",
+      filter: "Fundraising",
+      title:
+        "What SEA and Gulf VCs Are Actually Funding in 2025 — and What They're Passing On",
+      time: "13 min",
+      date: "December 2024",
+    },
+    {
+      category: "Markets · Singapore",
+      filter: "Markets",
+      title:
+        "Building a Startup in Singapore as a Foreign Founder: What Nobody Tells You",
+      time: "10 min",
+      date: "December 2024",
+    },
+    {
+      category: "Cybersecurity · Enterprise",
+      filter: "AI & Cybersecurity",
+      title:
+        "Zero-Trust in Practice: Why Most Implementations Fail Before They Start",
+      time: "11 min",
+      date: "November 2024",
+    },
+  ];
+
+  const filters = [
+    "All",
+    "AI & Cybersecurity",
+    "Venture Building",
+    "GTM & Sales",
+    "Fundraising",
+    "Markets",
+    "Deep Tech",
+  ];
+
+  const filteredPosts =
+    activeFilter === "All"
+      ? posts
+      : posts.filter((post) => post.filter === activeFilter);
 
   return (
-    <div className="insights-page">
-
+    <>
       <style>{`
-
-        /* =========================
-           INSIGHTS PAGE ONLY
-        ========================= */
-
-        .insights-page {
-          --bg: #ffffff;
-          --bg2: #f7f9fc;
-          --bg3: #eef3f8;
-          --dark: #111111;
-          --dark2: #293033;
-          --muted: #6b7a8d;
-          --muted2: #8fa0b0;
-          --pink: #f01965;
-          --pink-dark: #cc1357;
-          --pink-light: #fde8ef;
-          --blue: #029fe7;
-          --border: #e2e8f0;
-          --grad: linear-gradient(
-            135deg,
-            #e8e0f7 0%,
-            #fce4ef 50%,
-            #d8edfa 100%
-          );
-          --ff-h: 'Raleway', sans-serif;
-          --ff-s: 'Roboto', sans-serif;
-          --ff-b: 'Open Sans', sans-serif;
-
-          color: var(--dark);
-          font-family: var(--ff-b);
-        }
-
-        .insights-page *,
-        .insights-page *::before,
-        .insights-page *::after {
+        * {
           box-sizing: border-box;
         }
 
-        .insights-page nav {
-          position: sticky;
-          top: 0;
-          z-index: 200;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem 3rem;
-          background: rgba(255,255,255,0.97);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid var(--border);
-          box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+        html {
+          scroll-behavior: smooth;
         }
 
-        .insights-page .nav-in {
-          width: 100%;
-          max-width: 1140px;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .insights-page .logo {
-          font-family: var(--ff-h);
-          font-size: 1.4rem;
-          font-weight: 800;
-          color: var(--dark);
-          letter-spacing: -0.02em;
-          text-decoration: none;
-        }
-
-        .insights-page .logo span {
-          color: var(--pink);
-        }
-
-        .insights-page .nav-links {
-          display: flex;
-          gap: 0.15rem;
-          list-style: none;
+        body {
           margin: 0;
-          padding: 0;
-        }
-
-        .insights-page .nav-links a {
-          font-family: var(--ff-b);
-          font-size: 0.78rem;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          color: var(--dark2);
-          padding: 0.45rem 0.85rem;
-          border-radius: 4px;
-          text-decoration: none;
-          transition: color .2s, background .2s;
-        }
-
-        .insights-page .nav-links a:hover {
-          color: var(--pink);
-          background: var(--pink-light);
-        }
-
-        .insights-page .btn-talk {
-          font-family: var(--ff-b);
-          font-size: 0.78rem;
-          font-weight: 700;
-          padding: 0.6rem 1.5rem;
-          background: #111;
+          background: #08090d;
           color: #fff;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: background .2s;
+          font-family: "Open Sans", Arial, sans-serif;
         }
 
-        .insights-page .btn-talk:hover {
-          background: var(--pink);
+        a {
+          color: inherit;
+          text-decoration: none;
         }
 
-        /* =========================
-           HERO
-        ========================= */
-
-        .insights-page .page-hero {
-          padding: 6rem 3rem 4rem;
-          background: var(--grad);
-          position: relative;
-          overflow: hidden;
+        button,
+        input {
+          font-family: inherit;
         }
 
-        .insights-page .page-hero::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: rgba(255,255,255,0.55);
-          z-index: 0;
+        /* NAVBAR */
+
+        .in-nav {
+          position: fixed;
+          z-index: 1000;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(1180px, calc(100% - 32px));
+          padding: 14px 18px;
+          border-radius: 22px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(10,11,17,.78);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.3);
         }
 
-        .insights-page .hero-glow {
-          position: absolute;
-          width: 600px;
-          height: 400px;
-          background: radial-gradient(
-            circle,
-            rgba(108,99,255,0.07) 0%,
-            transparent 70%
-          );
-          top: 0;
-          left: -100px;
-          pointer-events: none;
-          z-index: 1;
-        }
-
-        .insights-page .hero-content {
-          position: relative;
-          z-index: 2;
-          max-width: 700px;
-          margin: 0 auto;
-        }
-
-        .insights-page .eyebrow {
-          display: block;
-          width: 48px;
-          height: 3px;
-          background: var(--pink);
-          margin-bottom: 1rem;
-          border-radius: 2px;
-        }
-
-        .insights-page .hero-label {
-          font-family: var(--ff-b);
-          font-size: 0.95rem;
-          color: var(--dark);
-          margin-bottom: 0.35rem;
-        }
-
-        .insights-page .hero-title {
-          font-family: var(--ff-h);
-          font-size: clamp(2.5rem,5vw,4rem);
-          font-weight: 900;
-          line-height: 1;
-          letter-spacing: -0.02em;
-          color: var(--pink);
-          margin: 0;
-        }
-
-        .insights-page .hero-text {
-          font-family: var(--ff-b);
-          font-size: 1.1rem;
-          color: var(--muted);
-          margin-top: 1.5rem;
-          line-height: 1.8;
-          margin-bottom: 0;
-        }
-
-        /* =========================
-           SECTIONS
-        ========================= */
-
-        .insights-page .insights-section {
-          padding: 5.5rem 3rem;
-          background: var(--bg);
-        }
-
-        .insights-page .section-container {
-          max-width: 1140px;
-          margin: 0 auto;
-        }
-
-        .insights-page .section-label {
-          font-family: var(--ff-b);
-          font-size: 0.72rem;
-          font-weight: 500;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--muted);
-          margin-bottom: 0.5rem;
-        }
-
-        /* =========================
-           FEATURED POST
-        ========================= */
-
-        .insights-page .featured-post {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0;
-          background: #fff;
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          overflow: hidden;
-          margin-bottom: 3rem;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-          transition: border-color .2s;
-        }
-
-        .insights-page .featured-post:hover {
-          border-color: rgba(0,200,255,0.3);
-        }
-
-        .insights-page .featured-image {
-          background: var(--grad);
-          min-height: 360px;
+        .in-nav-inner {
           display: flex;
           align-items: center;
-          justify-content: center;
-          font-size: 4rem;
-          position: relative;
-          overflow: hidden;
+          justify-content: space-between;
+          gap: 20px;
         }
 
-        .insights-page .featured-image::after {
-          content: "";
-          position: absolute;
-          inset: 0;
+        .in-logo {
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: -1.5px;
+        }
+
+        .in-logo span {
+          color: #f01965;
+        }
+
+        .in-links {
+          display: flex;
+          align-items: center;
+          gap: 21px;
+        }
+
+        .in-links a {
+          color: rgba(255,255,255,.68);
+          font-size: 13px;
+          font-weight: 700;
+          transition: .25s ease;
+        }
+
+        .in-links a:hover,
+        .in-active {
+          color: #fff !important;
+        }
+
+        .in-talk {
+          border: 0;
+          padding: 13px 20px;
+          border-radius: 13px;
           background: linear-gradient(
             135deg,
-            rgba(0,200,255,0.05),
-            rgba(108,99,255,0.08)
+            #f01965,
+            #b70b6d
+          );
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .in-menu {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.05);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+        }
+
+        /* HERO */
+
+        .in-hero {
+          position: relative;
+          min-height: 78vh;
+          display: flex;
+          align-items: center;
+          padding: 150px 7vw 90px;
+          overflow: hidden;
+        }
+
+        .in-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            );
+          background-size: 60px 60px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent
           );
         }
 
-        .insights-page .featured-body {
-          padding: 3rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          background: #fff;
-        }
-
-        .insights-page .post-category {
-          font-family: var(--ff-b);
-          font-size: 0.7rem;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--pink);
-          margin-bottom: 1rem;
-          font-weight: 500;
-        }
-
-        .insights-page .post-title {
-          font-family: var(--ff-h);
-          font-size: 1.5rem;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-          line-height: 1.2;
-          color: var(--dark2);
-          margin-bottom: 1rem;
-        }
-
-        .insights-page .post-excerpt {
-          font-family: var(--ff-b);
-          font-size: 0.9rem;
-          color: var(--muted);
-          line-height: 1.75;
-          margin-bottom: 1.5rem;
-        }
-
-        .insights-page .post-meta {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          font-family: var(--ff-b);
-          font-size: 0.78rem;
-          color: var(--muted);
-        }
-
-        .insights-page .post-author {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .insights-page .author-dot {
-          width: 24px;
-          height: 24px;
+        .in-orb {
+          position: absolute;
           border-radius: 50%;
-          background: var(--pink);
+          filter: blur(100px);
+          opacity: .2;
+        }
+
+        .in-orb-one {
+          width: 420px;
+          height: 420px;
+          left: -180px;
+          top: 80px;
+          background: #f01965;
+          animation: inFloat 8s ease-in-out infinite alternate;
+        }
+
+        .in-orb-two {
+          width: 400px;
+          height: 400px;
+          right: -180px;
+          bottom: -50px;
+          background: #029fe7;
+          animation: inFloat 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes inFloat {
+          to {
+            transform: translate(70px,-45px) scale(1.2);
+          }
+        }
+
+        .in-hero-inner {
+          position: relative;
+          z-index: 2;
+          max-width: 1180px;
+          width: 100%;
+          margin: auto;
+        }
+
+        .in-eyebrow {
+          display: inline-flex;
+          padding: 8px 13px;
+          border-radius: 100px;
+          border: 1px solid rgba(255,255,255,.13);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.62);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+        }
+
+        .in-hero h1 {
+          margin: 25px 0 0;
+          max-width: 1000px;
+          font-size: clamp(58px,8vw,105px);
+          line-height: .9;
+          letter-spacing: -6px;
+          font-weight: 900;
+        }
+
+        .in-gradient {
+          background:
+            linear-gradient(
+              100deg,
+              #f01965,
+              #ff5890,
+              #029fe7
+            );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: inGradient 5s linear infinite;
+        }
+
+        @keyframes inGradient {
+          to {
+            background-position: 200% center;
+          }
+        }
+
+        .in-hero-copy {
+          max-width: 700px;
+          margin-top: 30px;
+          color: rgba(255,255,255,.56);
+          font-size: 16px;
+          line-height: 1.85;
+        }
+
+        /* FEATURED */
+
+        .in-section {
+          padding: 100px 7vw;
+        }
+
+        .in-container {
+          max-width: 1180px;
+          margin: auto;
+        }
+
+        .in-label {
+          color: #f01965;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+          margin-bottom: 16px;
+        }
+
+        .in-feature {
+          position: relative;
+          padding: 45px;
+          border-radius: 32px;
+          border: 1px solid rgba(255,255,255,.1);
+          background:
+            radial-gradient(
+              circle at 90% 10%,
+              rgba(240,25,101,.16),
+              transparent 30%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.07),
+              rgba(255,255,255,.025)
+            );
+          overflow: hidden;
+        }
+
+        .in-feature::before {
+          content: "";
+          position: absolute;
+          width: 300px;
+          height: 300px;
+          right: -130px;
+          bottom: -150px;
+          border-radius: 50%;
+          background: #029fe7;
+          filter: blur(90px);
+          opacity: .1;
+        }
+
+        .in-feature-top {
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          justify-content: center;
-          font-size: 0.65rem;
-          font-weight: 700;
+          gap: 20px;
+        }
+
+        .in-feature-category {
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: .1em;
+        }
+
+        .in-feature-mark {
+          width: 48px;
+          height: 48px;
+          display: grid;
+          place-items: center;
+          border-radius: 15px;
+          background: rgba(255,255,255,.06);
+          border: 1px solid rgba(255,255,255,.08);
+          font-weight: 900;
+        }
+
+        .in-feature h2 {
+          position: relative;
+          z-index: 1;
+          max-width: 900px;
+          margin: 30px 0 18px;
+          font-size: clamp(34px,4vw,58px);
+          line-height: 1;
+          letter-spacing: -2.5px;
+        }
+
+        .in-feature p {
+          position: relative;
+          z-index: 1;
+          max-width: 820px;
+          margin: 0;
+          color: rgba(255,255,255,.52);
+          font-size: 14px;
+          line-height: 1.8;
+        }
+
+        .in-feature-meta {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-top: 30px;
+          color: rgba(255,255,255,.4);
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .in-read {
+          display: inline-flex;
+          position: relative;
+          z-index: 1;
+          margin-top: 30px;
+          padding: 13px 17px;
+          border-radius: 12px;
+          background: #fff;
+          color: #08090d;
+          font-size: 10px;
+          font-weight: 900;
+          transition: .3s ease;
+        }
+
+        .in-read:hover {
+          transform: translateY(-4px);
+        }
+
+        /* FILTER */
+
+        .in-filter-wrap {
+          margin-top: 80px;
+        }
+
+        .in-filter {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 25px;
+        }
+
+        .in-filter button {
+          padding: 10px 14px;
+          border-radius: 100px;
+          border: 1px solid rgba(255,255,255,.09);
+          background: rgba(255,255,255,.035);
+          color: rgba(255,255,255,.52);
+          font-size: 10px;
+          font-weight: 800;
+          cursor: pointer;
+          transition: .25s ease;
+        }
+
+        .in-filter button:hover,
+        .in-filter button.active {
+          background: #f01965;
+          border-color: #f01965;
           color: #fff;
         }
 
-        .insights-page .read-link {
-          font-family: var(--ff-b);
-          font-size: 0.8rem;
-          color: var(--pink);
-          letter-spacing: 0.04em;
-        }
+        /* POSTS */
 
-        /* =========================
-           FILTER
-        ========================= */
-
-        .insights-page .filter-bar {
-          display: flex;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-          margin-bottom: 3rem;
-        }
-
-        .insights-page .filter-btn {
-          font-family: var(--ff-b);
-          font-size: 0.78rem;
-          font-weight: 500;
-          letter-spacing: 0.04em;
-          padding: 0.45rem 1rem;
-          border-radius: 100px;
-          border: 1px solid var(--border);
-          color: var(--muted);
-          background: transparent;
-          cursor: pointer;
-          transition: all .2s;
-        }
-
-        .insights-page .filter-btn:hover,
-        .insights-page .filter-btn.active {
-          border-color: var(--pink);
-          color: var(--pink);
-          background: var(--pink-light);
-        }
-
-        /* =========================
-           POST GRID
-        ========================= */
-
-        .insights-page .post-grid {
+        .in-post-grid {
+          margin-top: 35px;
           display: grid;
           grid-template-columns: repeat(3,1fr);
-          gap: 2rem;
+          gap: 16px;
         }
 
-        .insights-page .post-card {
-          background: #fff;
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          overflow: hidden;
-          transition: border-color .2s, transform .2s;
-          cursor: pointer;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        }
-
-        .insights-page .post-card:hover {
-          border-color: rgba(0,200,255,0.3);
-          transform: translateY(-2px);
-        }
-
-        .insights-page .post-card-img {
-          height: 160px;
-          background: var(--grad);
+        .in-post {
+          min-height: 330px;
+          padding: 25px;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2.5rem;
-          position: relative;
+          flex-direction: column;
+          border-radius: 23px;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.035);
+          transition:
+            transform .3s ease,
+            border .3s ease,
+            background .3s ease;
         }
 
-        .insights-page .post-card-body {
-          padding: 1.5rem;
+        .in-post:hover {
+          transform: translateY(-8px);
+          border-color: rgba(240,25,101,.3);
+          background: rgba(255,255,255,.055);
         }
 
-        .insights-page .post-card .post-category {
-          margin-bottom: 0.6rem;
+        .in-post-category {
+          color: #029fe7;
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: .08em;
+          text-transform: uppercase;
         }
 
-        .insights-page .post-card .post-title {
-          font-size: 1rem;
-          margin-bottom: 0.6rem;
-          line-height: 1.3;
+        .in-post h3 {
+          margin: 25px 0 15px;
+          font-size: 21px;
+          line-height: 1.18;
+          letter-spacing: -.7px;
         }
 
-        .insights-page .post-card .post-excerpt {
-          font-size: 0.82rem;
-          margin-bottom: 1rem;
-        }
-
-        .insights-page .post-card .post-meta {
-          font-size: 0.75rem;
-        }
-
-        /* =========================
-           NEWSLETTER
-        ========================= */
-
-        .insights-page .newsletter-section {
-          padding: 5.5rem 3rem;
-          background: var(--bg);
-        }
-
-        .insights-page .nl-strip {
-          background: var(--bg2);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 2.5rem 3rem;
+        .in-post-bottom {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 2rem;
-          flex-wrap: wrap;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        }
-
-        .insights-page .nl-text h3 {
-          font-family: var(--ff-h);
-          font-size: 1.1rem;
+          gap: 10px;
+          margin-top: auto;
+          padding-top: 25px;
+          color: rgba(255,255,255,.34);
+          font-size: 9px;
           font-weight: 800;
-          color: var(--dark2);
-          margin: 0 0 0.4rem;
         }
 
-        .insights-page .nl-text p {
-          font-family: var(--ff-b);
-          font-size: 0.88rem;
-          color: var(--muted);
-          max-width: 420px;
+        .in-post-arrow {
+          color: #f01965;
+          font-size: 18px;
+        }
+
+        /* NEWSLETTER */
+
+        .in-newsletter {
+          padding: 120px 7vw;
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(240,25,101,.12),
+              transparent 42%
+            );
+        }
+
+        .in-newsletter-box {
+          max-width: 900px;
+          margin: auto;
+          text-align: center;
+        }
+
+        .in-newsletter h2 {
           margin: 0;
+          font-size: clamp(45px,6vw,75px);
+          line-height: .95;
+          letter-spacing: -4px;
         }
 
-        .insights-page .nl-form {
+        .in-newsletter p {
+          max-width: 580px;
+          margin: 25px auto 30px;
+          color: rgba(255,255,255,.45);
+          line-height: 1.8;
+          font-size: 13px;
+        }
+
+        .in-form {
           display: flex;
-          gap: 0.75rem;
+          max-width: 550px;
+          margin: auto;
+          padding: 5px;
+          border-radius: 15px;
+          background: rgba(255,255,255,.06);
+          border: 1px solid rgba(255,255,255,.1);
         }
 
-        .insights-page .nl-input {
-          font-family: var(--ff-b);
-          font-size: 0.88rem;
-          padding: 0.75rem 1.25rem;
-          background: #fff;
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          color: var(--dark);
-          min-width: 240px;
-          outline: none;
-        }
-
-        .insights-page .nl-input:focus {
-          border-color: var(--pink);
-        }
-
-        .insights-page .nl-input::placeholder {
-          color: var(--muted);
-        }
-
-        .insights-page .btn-primary {
-          font-family: var(--ff-b);
-          font-size: 0.82rem;
-          font-weight: 700;
-          padding: 0.75rem 1.5rem;
-          background: var(--pink);
+        .in-form input {
+          min-width: 0;
+          flex: 1;
+          border: 0;
+          outline: 0;
+          padding: 14px;
+          background: transparent;
           color: #fff;
-          border: none;
-          border-radius: 30px;
+          font-size: 12px;
+        }
+
+        .in-form input::placeholder {
+          color: rgba(255,255,255,.32);
+        }
+
+        .in-form button {
+          border: 0;
+          padding: 13px 18px;
+          border-radius: 11px;
+          background: #fff;
+          color: #08090d;
+          font-size: 10px;
+          font-weight: 900;
           cursor: pointer;
         }
 
-        /* =========================
-           FOOTER
-        ========================= */
+        /* FOOTER */
 
-        .insights-page footer {
-          background: #111;
-          color: rgba(255,255,255,0.7);
-          padding: 2.5rem 3rem;
+        .in-footer {
+          padding: 35px 7vw;
+          border-top: 1px solid rgba(255,255,255,.08);
+          background: #07080b;
         }
 
-        .insights-page .f-in {
-          max-width: 1140px;
-          margin: 0 auto;
+        .in-footer-inner {
+          max-width: 1180px;
+          margin: auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 1rem;
+          gap: 20px;
         }
 
-        .insights-page .f-brand {
-          font-family: var(--ff-h);
-          font-size: 1.1rem;
-          font-weight: 800;
-          color: #fff;
+        .in-footer-logo {
+          font-size: 23px;
+          font-weight: 900;
         }
 
-        .insights-page .f-brand span {
-          color: var(--pink);
+        .in-footer-logo span {
+          color: #f01965;
         }
 
-        .insights-page .f-links {
-          display: flex;
-          gap: 1.5rem;
-          flex-wrap: wrap;
+        .in-footer-text {
+          color: rgba(255,255,255,.38);
+          font-size: 11px;
+          line-height: 1.7;
+          text-align: right;
         }
 
-        .insights-page .f-links a {
-          font-family: var(--ff-b);
-          font-size: 0.72rem;
-          color: rgba(255,255,255,0.55);
-          text-decoration: none;
-          transition: color .2s;
+        /* REVEAL */
+
+        .in-reveal {
+          opacity: 0;
+          transform: translateY(40px);
+          transition:
+            opacity .8s ease,
+            transform .8s cubic-bezier(.2,.8,.2,1);
         }
 
-        .insights-page .f-links a:hover {
-          color: var(--pink);
-        }
-
-        .insights-page .f-meta {
-          font-family: var(--ff-b);
-          font-size: 0.68rem;
-          color: rgba(255,255,255,0.35);
-        }
-
-        /* =========================
-           REVEAL
-        ========================= */
-
-        .insights-page .reveal {
+        .in-visible {
           opacity: 1;
-          transform: none;
+          transform: translateY(0);
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        /* MOBILE */
 
-        @media (max-width: 900px) {
-          .insights-page nav {
-            padding: 0.9rem 1.5rem;
-          }
+        @media (max-width: 1050px) {
 
-          .insights-page .nav-links {
+          .in-links,
+          .in-talk {
             display: none;
           }
 
-          .insights-page .page-hero {
-            padding: 5rem 1.5rem 3rem;
+          .in-menu {
+            display: block;
           }
 
-          .insights-page .insights-section,
-          .insights-page .newsletter-section {
-            padding: 4rem 1.5rem;
+          .in-mobile-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(10,11,17,.97);
+            backdrop-filter: blur(20px);
           }
 
-          .insights-page .featured-post {
-            grid-template-columns: 1fr;
+          .in-mobile-menu a {
+            display: block;
+            padding: 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,.7);
+            font-size: 13px;
+            font-weight: 700;
           }
 
-          .insights-page .post-grid {
+          .in-post-grid {
             grid-template-columns: 1fr 1fr;
           }
-
-          .insights-page footer {
-            padding: 2rem 1.5rem;
-          }
-
-          .insights-page .f-in {
-            flex-direction: column;
-            text-align: center;
-          }
         }
 
-        @media (max-width: 600px) {
-          .insights-page .post-grid {
+        @media (max-width: 760px) {
+
+          .in-nav {
+            top: 8px;
+            width: calc(100% - 18px);
+            border-radius: 18px;
+          }
+
+          .in-hero {
+            min-height: auto;
+            padding: 130px 20px 75px;
+          }
+
+          .in-hero h1 {
+            font-size: 53px;
+            letter-spacing: -3px;
+          }
+
+          .in-hero-copy {
+            font-size: 14px;
+          }
+
+          .in-section {
+            padding: 75px 20px;
+          }
+
+          .in-feature {
+            padding: 27px;
+            border-radius: 25px;
+          }
+
+          .in-feature h2 {
+            font-size: 35px;
+          }
+
+          .in-post-grid {
             grid-template-columns: 1fr;
           }
 
-          .insights-page .nl-form {
-            width: 100%;
+          .in-post {
+            min-height: 290px;
+          }
+
+          .in-filter-wrap {
+            margin-top: 60px;
+          }
+
+          .in-newsletter {
+            padding: 90px 20px;
+          }
+
+          .in-newsletter h2 {
+            font-size: 50px;
+            letter-spacing: -3px;
+          }
+
+          .in-form {
             flex-direction: column;
+            padding: 7px;
           }
 
-          .insights-page .nl-input {
+          .in-form button {
             width: 100%;
-            min-width: 0;
           }
 
-          .insights-page .hero-title {
-            font-size: 2.5rem;
+          .in-footer {
+            padding: 28px 20px;
+          }
+
+          .in-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .in-footer-text {
+            text-align: left;
           }
         }
-
       `}</style>
 
-      {/* NAVBAR */}
+      <div>
 
-      <nav>
-        <div className="nav-in">
+        {/* NAVBAR */}
 
-          <a href="/" className="logo">
-            Code<span>Cap</span>
-          </a>
+        <nav className="in-nav">
 
-          <ul className="nav-links">
-            <li>
-              <a href="/venture-studio">Venture Studio</a>
-            </li>
+          <div className="in-nav-inner">
 
-            <li>
-              <a href="/services">Services</a>
-            </li>
+            <a href="/" className="in-logo">
+              Code<span>Cap</span>
+            </a>
 
-            <li>
-              <a href="/products">Products</a>
-            </li>
+            <div className="in-links">
 
-            <li>
-              <a href="/portfolio">Portfolio</a>
-            </li>
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
 
-            <li>
-              <a href="/team">Team</a>
-            </li>
+              <a href="/services">
+                Services
+              </a>
 
-            <li>
-              <a href="/insights">Insights</a>
-            </li>
+              <a href="/products">
+                Products
+              </a>
 
-            <li>
-              <a href="/podcast">Podcast</a>
-            </li>
-          </ul>
+              <a href="/portfolio">
+                Portfolio
+              </a>
 
-          <button
-            className="btn-talk"
-            onClick={() => {
-              window.location.href = "mailto:hello@codecap.ai";
-            }}
-          >
-            Talk to us
-          </button>
+              <a href="/team">
+                Team
+              </a>
 
-        </div>
-      </nav>
+              <a
+                href="/insights"
+                className="in-active"
+              >
+                Insights
+              </a>
 
-      {/* HERO */}
+              <a href="/podcast">
+                Podcast
+              </a>
 
-      <section className="page-hero">
-
-        <div className="hero-glow"></div>
-
-        <div className="hero-content">
-
-          <div className="eyebrow"></div>
-
-          <div className="hero-label">
-            Insights
-          </div>
-
-          <h1 className="hero-title">
-            Thinking from
-            <br />
-            the studio floor.
-          </h1>
-
-          <p className="hero-text">
-            Not keynote wisdom. Not recycled LinkedIn takes. What we're
-            seeing from inside early-stage companies across Southeast Asia,
-            the Gulf, and South Asia — raw, operational, and direct.
-          </p>
-
-        </div>
-
-      </section>
-
-      {/* POSTS */}
-
-      <section className="insights-section">
-
-        <div className="section-container">
-
-          <div className="section-label">
-            Featured
-          </div>
-
-          {/* FEATURED */}
-
-          <div className="featured-post reveal">
-
-            <div className="featured-image">
-              🛡️
             </div>
 
-            <div className="featured-body">
+            <button
+              className="in-talk"
+              onClick={() =>
+                (window.location.href =
+                  "mailto:hello@codecap.ai")
+              }
+            >
+              Talk to us
+            </button>
 
-              <div>
+            <button
+              className="in-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "×" : "☰"}
+            </button>
 
-                <div className="post-category">
+          </div>
+
+          {menuOpen && (
+            <div className="in-mobile-menu">
+
+              <a href="/">
+                Home
+              </a>
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a href="/services">
+                Services
+              </a>
+
+              <a href="/products">
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+              <a href="mailto:hello@codecap.ai">
+                Talk to us →
+              </a>
+
+            </div>
+          )}
+
+        </nav>
+
+        {/* HERO */}
+
+        <section className="in-hero">
+
+          <div className="in-grid"></div>
+
+          <div className="in-orb in-orb-one"></div>
+          <div className="in-orb in-orb-two"></div>
+
+          <div className="in-hero-inner in-reveal">
+
+            <div className="in-eyebrow">
+              Insights
+            </div>
+
+            <h1>
+              Thinking from
+              <br />
+              the{" "}
+              <span className="in-gradient">
+                studio floor.
+              </span>
+            </h1>
+
+            <p className="in-hero-copy">
+              Not keynote wisdom. Not recycled LinkedIn
+              takes. What we're seeing from inside
+              early-stage companies across Southeast Asia,
+              the Gulf, and South Asia — raw, operational,
+              and direct.
+            </p>
+
+          </div>
+
+        </section>
+
+        {/* FEATURED */}
+
+        <section className="in-section">
+
+          <div className="in-container">
+
+            <div className="in-label in-reveal">
+              Featured
+            </div>
+
+            <article className="in-feature in-reveal">
+
+              <div className="in-feature-top">
+
+                <div className="in-feature-category">
                   Cybersecurity · AI
                 </div>
 
-                <div className="post-title">
-                  AI Security in 2025: The Threat Landscape Is Changing Faster Than the Products
-                </div>
-
-                <div className="post-excerpt">
-                  Enterprise CISOs across SEA and the Gulf are navigating
-                  a threat environment that LLMs have fundamentally altered.
-                  Attackers are moving faster, phishing is nearly
-                  indistinguishable, and most security products are six
-                  months behind reality. Here's what the gap actually looks
-                  like from inside portfolio companies — and what's being
-                  built to close it.
+                <div className="in-feature-mark">
+                  01
                 </div>
 
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: "1rem"
-                }}
-              >
-
-                <div className="post-meta">
-
-                  <div className="post-author">
-                    <div className="author-dot">
-                      CC
-                    </div>
-
-                    <span>
-                      CodeCap Team
-                    </span>
-                  </div>
-
-                  <span>·</span>
-                  <span>12 min read</span>
-                  <span>·</span>
-                  <span>April 2025</span>
-
-                </div>
-
-                <span className="read-link">
-                  Read article →
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* FILTER */}
-
-          <div className="filter-bar reveal">
-
-            {[
-              "All",
-              "AI & Cybersecurity",
-              "Venture Building",
-              "GTM & Sales",
-              "Fundraising",
-              "Markets",
-              "Deep Tech"
-            ].map((filter) => (
-              <button
-                key={filter}
-                className={`filter-btn ${
-                  activeFilter === filter ? "active" : ""
-                }`}
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-
-          </div>
-
-          {/* POST GRID */}
-
-          <div className="post-grid reveal">
-
-            <div className="post-card">
-              <div className="post-card-img">📈</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  GTM · Southeast Asia
-                </div>
-
-                <div className="post-title">
-                  Why Most AI Startups in SEA Fail at GTM (And What the Survivors Do Differently)
-                </div>
-
-                <div className="post-excerpt">
-                  The product works. The market exists. But the deals aren't
-                  closing. Here's the pattern we keep seeing — and why the
-                  fix isn't about the product.
-                </div>
-
-                <div className="post-meta">
-                  <span>8 min read</span>
-                  <span>·</span>
-                  <span>March 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">⚖️</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Legal · Gulf Markets
-                </div>
-
-                <div className="post-title">
-                  The DIFC vs ADGM Decision: A Founder's Practical Guide to Gulf Entity Setup
-                </div>
-
-                <div className="post-excerpt">
-                  Both are good options. But they're not the same. The choice
-                  depends on your stage, your investors, and what you're
-                  actually doing in the market.
-                </div>
-
-                <div className="post-meta">
-                  <span>10 min read</span>
-                  <span>·</span>
-                  <span>March 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">🏗️</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Cybersecurity · Venture Build
-                </div>
-
-                <div className="post-title">
-                  Building a Threat Intelligence Product from Zero: What We Learned in 12 Months
-                </div>
-
-                <div className="post-excerpt">
-                  We built one. We had to rebuild parts of it. Here's the
-                  honest account of what we got wrong, what we got right,
-                  and what buyers actually need vs. what they say they need.
-                </div>
-
-                <div className="post-meta">
-                  <span>14 min read</span>
-                  <span>·</span>
-                  <span>February 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">🤝</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Deal Structure · South Asia
-                </div>
-
-                <div className="post-title">
-                  Why Indian Founders Push Back on Equity — and Why We Changed Our Approach
-                </div>
-
-                <div className="post-excerpt">
-                  Revenue share isn't a compromise. For Indian pre-seed
-                  founders, it's often the right alignment mechanism.
-                  Here's how we evolved our thinking and deal structure.
-                </div>
-
-                <div className="post-meta">
-                  <span>7 min read</span>
-                  <span>·</span>
-                  <span>February 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">💡</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Venture Building · Opinion
-                </div>
-
-                <div className="post-title">
-                  The Venture Studio Model Is Broken. Here's What We're Doing Instead.
-                </div>
-
-                <div className="post-excerpt">
-                  Most venture studios are glorified consultancies with
-                  equity kickers. We think the model needs a rewrite.
-                  Here's our alternative — and why it requires actually
-                  doing the work.
-                </div>
-
-                <div className="post-meta">
-                  <span>9 min read</span>
-                  <span>·</span>
-                  <span>January 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">🤖</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  AI · GTM
-                </div>
-
-                <div className="post-title">
-                  AI-Powered Sales Intelligence: The Tools That Are Actually Moving Pipeline in 2025
-                </div>
-
-                <div className="post-excerpt">
-                  We've tested most of them. Some work. Most don't survive
-                  contact with a real deal. Here's what's actually moving
-                  enterprise pipeline in SEA and the Gulf right now.
-                </div>
-
-                <div className="post-meta">
-                  <span>11 min read</span>
-                  <span>·</span>
-                  <span>January 2025</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">💰</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Fundraising · VC
-                </div>
-
-                <div className="post-title">
-                  What SEA and Gulf VCs Are Actually Funding in 2025 — and What They're Passing On
-                </div>
-
-                <div className="post-excerpt">
-                  Based on direct conversations with 40+ VCs across
-                  Singapore, Dubai, and Mumbai over the past six months.
-                  The patterns are clear — and some of them will surprise you.
-                </div>
-
-                <div className="post-meta">
-                  <span>13 min read</span>
-                  <span>·</span>
-                  <span>December 2024</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">🌏</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Markets · Singapore
-                </div>
-
-                <div className="post-title">
-                  Building a Startup in Singapore as a Foreign Founder: What Nobody Tells You
-                </div>
-
-                <div className="post-excerpt">
-                  Entity setup, banking, MOM passes, hiring local talent,
-                  navigating government grants. The practical reality of
-                  landing in SG and building from there.
-                </div>
-
-                <div className="post-meta">
-                  <span>10 min read</span>
-                  <span>·</span>
-                  <span>December 2024</span>
-                </div>
-
-              </div>
-            </div>
-
-            <div className="post-card">
-              <div className="post-card-img">🔐</div>
-
-              <div className="post-card-body">
-
-                <div className="post-category">
-                  Cybersecurity · Enterprise
-                </div>
-
-                <div className="post-title">
-                  Zero-Trust in Practice: Why Most Implementations Fail Before They Start
-                </div>
-
-                <div className="post-excerpt">
-                  The framework is sound. The problem is almost always
-                  implementation — specifically, the gap between what gets
-                  approved in the boardroom and what gets deployed in production.
-                </div>
-
-                <div className="post-meta">
-                  <span>11 min read</span>
-                  <span>·</span>
-                  <span>November 2024</span>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* NEWSLETTER */}
-
-      <section className="newsletter-section">
-
-        <div className="section-container">
-
-          <div className="nl-strip reveal">
-
-            <div className="nl-text">
-
-              <h3>
-                Get Insights in your inbox
-              </h3>
+              <h2>
+                AI Security in 2025:
+                <br />
+                The Threat Landscape Is
+                Changing Faster Than the
+                Products
+              </h2>
 
               <p>
-                New articles, market observations, and things we're watching
-                — sent directly to you. No pitch decks, no newsletters
-                written by AI, no noise.
+                The security landscape around AI is
+                changing faster than most products can
+                adapt. Here's what we're seeing from
+                inside enterprise cybersecurity and
+                early-stage product building.
               </p>
+
+              <div className="in-feature-meta">
+                <span>CodeCap Team</span>
+                <span>12 min read</span>
+                <span>April 2025</span>
+              </div>
+
+              <a
+                href="#posts"
+                className="in-read"
+              >
+                Read article →
+              </a>
+
+            </article>
+
+            {/* FILTERS */}
+
+            <div
+              className="in-filter-wrap in-reveal"
+              id="posts"
+            >
+
+              <div className="in-label">
+                Explore Insights
+              </div>
+
+              <div className="in-filter">
+
+                {filters.map((filter) => (
+                  <button
+                    key={filter}
+                    className={
+                      activeFilter === filter
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setActiveFilter(filter)
+                    }
+                  >
+                    {filter}
+                  </button>
+                ))}
+
+              </div>
 
             </div>
 
-            <div className="nl-form">
+            {/* POSTS */}
+
+            <div className="in-post-grid">
+
+              {filteredPosts.map((post, index) => (
+                <article
+                  className="in-post in-reveal"
+                  key={post.title}
+                >
+
+                  <div className="in-post-category">
+                    {post.category}
+                  </div>
+
+                  <h3>
+                    {post.title}
+                  </h3>
+
+                  <div className="in-post-bottom">
+
+                    <span>
+                      {post.time} · {post.date}
+                    </span>
+
+                    <span className="in-post-arrow">
+                      →
+                    </span>
+
+                  </div>
+
+                </article>
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* NEWSLETTER */}
+
+        <section className="in-newsletter">
+
+          <div className="in-newsletter-box in-reveal">
+
+            <div className="in-label">
+              Stay in the Loop
+            </div>
+
+            <h2>
+              Get Insights
+              <br />
+              in your inbox.
+            </h2>
+
+            <p>
+              Practical thinking from the studio on AI,
+              cybersecurity, venture building, GTM,
+              fundraising and high-growth markets.
+            </p>
+
+            <form
+              className="in-form"
+              onSubmit={(e) => e.preventDefault()}
+            >
 
               <input
-                className="nl-input"
                 type="email"
-                placeholder="your@email.com"
+                placeholder="Your email address"
               />
 
-              <button className="btn-primary">
+              <button type="submit">
                 Subscribe
               </button>
 
+            </form>
+
+          </div>
+
+        </section>
+
+        {/* FOOTER */}
+
+        <footer className="in-footer">
+
+          <div className="in-footer-inner">
+
+            <div className="in-footer-logo">
+              Code<span>Cap</span>
+            </div>
+
+            <div className="in-footer-text">
+              © 2025 CodeCap Ventures · Singapore · UAE · India
+              <br />
+              hello@codecap.ai
             </div>
 
           </div>
 
-        </div>
+        </footer>
 
-      </section>
-
-      {/* FOOTER */}
-
-      <footer>
-
-        <div className="f-in">
-
-          <div className="f-brand">
-            Code<span>Cap</span>
-          </div>
-
-          <div className="f-links">
-
-            <a href="/venture-studio">
-              Venture Studio
-            </a>
-
-            <a href="/services">
-              Services
-            </a>
-
-            <a href="/products">
-              Products
-            </a>
-
-            <a href="/portfolio">
-              Portfolio
-            </a>
-
-            <a href="/team">
-              Team
-            </a>
-
-            <a href="/insights">
-              Insights
-            </a>
-
-            <a href="/podcast">
-              Podcast
-            </a>
-
-          </div>
-
-          <div className="f-meta">
-            © 2025 CodeCap Ventures · Singapore · UAE · India · hello@codecap.ai
-          </div>
-
-        </div>
-
-      </footer>
-
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -1,588 +1,1170 @@
+import React, { useEffect, useState } from "react";
+
 function Team() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const elements = document.querySelectorAll(".tm-reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("tm-visible");
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    const cards = document.querySelectorAll(".tm-tilt");
+
+    const moveCard = (e) => {
+      const card = e.currentTarget;
+      const rect = card.getBoundingClientRect();
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const rotateX =
+        ((y - rect.height / 2) / rect.height) * -5;
+
+      const rotateY =
+        ((x - rect.width / 2) / rect.width) * 5;
+
+      card.style.transform = `
+        perspective(1100px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-8px)
+      `;
+    };
+
+    const resetCard = (e) => {
+      e.currentTarget.style.transform =
+        "perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(0)";
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("mousemove", moveCard);
+      card.addEventListener("mouseleave", resetCard);
+    });
+
+    return () => {
+      observer.disconnect();
+
+      cards.forEach((card) => {
+        card.removeEventListener("mousemove", moveCard);
+        card.removeEventListener("mouseleave", resetCard);
+      });
+    };
+  }, []);
+
+  const team = [
+    {
+      name: "Baburaj Varma",
+      role: "Co-Founder & Managing Partner",
+      location:
+        "Singapore · Cybersecurity · Enterprise GTM · AMEA",
+      description:
+        "25+ year enterprise cybersecurity veteran. Trend Micro VP Technical Leader AMEA and Netskope Channel Sales Director India. At CodeCap, he leads the firm, partnership strategy, enterprise relationships and product commercialization.",
+      linkedin:
+        "https://www.linkedin.com/in/baburajvarma/",
+      number: "01"
+    },
+    {
+      name: "Tarun Gupta",
+      role: "Co-Founder & Partner",
+      location:
+        "India / SEA · Security Operations · Managed Security · Deep Tech",
+      description:
+        "Trend Micro Director Security Operations as a Service AMEA and Chief Delivery Officer at TRUGlobal. At CodeCap, he leads technical engagements across the cybersecurity portfolio.",
+      linkedin:
+        "https://www.linkedin.com/in/tarun-gupta-66b924a/",
+      number: "02"
+    },
+    {
+      name: "Atin Verma",
+      role: "Consulting Partner",
+      location: "Marketing & Brand",
+      description:
+        "Senior marketing and GTM professional with experience including Tenable India/South Asia.",
+      linkedin:
+        "https://www.linkedin.com/in/atinverma9/",
+      number: "03"
+    },
+    {
+      name: "Naveena Chowdary Koyyalamudi",
+      role: "Consulting Partner",
+      location: "Operations",
+      description:
+        "University of Colorado Denver background with experience across Plantillegence and Optum Global Solutions International B.V.",
+      linkedin:
+        "https://www.linkedin.com/in/naveenack/",
+      number: "04"
+    }
+  ];
+
+  const principles = [
+    {
+      number: "01",
+      title: "Execution over advice",
+      text:
+        "We get involved in the work, not just the strategy."
+    },
+    {
+      number: "02",
+      title: "Practitioners who sell",
+      text:
+        "Our experience comes from operating inside real markets."
+    },
+    {
+      number: "03",
+      title: "Compliant by design",
+      text:
+        "Strong execution needs the right governance and structure."
+    },
+    {
+      number: "04",
+      title: "Selective, not scalable",
+      text:
+        "We choose the companies and founders we work with carefully."
+    }
+  ];
+
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600&display=swap');
+      <style>{`
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-img { max-width: 100%; display: block; }
-a { text-decoration: none; color: inherit; }
+        * {
+          box-sizing: border-box;
+        }
 
-/* ── DESIGN TOKENS (Nicepage-inspired) ── */
-:root {
-  --bg:         #ffffff;
-  --bg2:        #f7f9fc;
-  --bg3:        #eef3f8;
-  --dark:       #111111;
-  --dark2:      #293033;
-  --muted:      #6b7a8d;
-  --muted2:     #8fa0b0;
-  --pink:       #f01965;       /* primary accent */
-  --pink-dark:  #cc1357;
-  --pink-light: #fde8ef;
-  --blue:       #029fe7;       /* secondary CTA */
-  --blue-dark:  #0282bc;
-  --blue-light: #e4f5fd;
-  --border:     #e2e8f0;
-  --border2:    rgba(240,25,101,0.15);
-  --grad:       linear-gradient(135deg, #e8e0f7 0%, #fce4ef 50%, #d8edfa 100%);
-  --grad2:      linear-gradient(135deg, #f01965 0%, #029fe7 100%);
-  --ff-h:   'Raleway', sans-serif;
-  --ff-s:   'Roboto', sans-serif;
-  --ff-b:   'Open Sans', sans-serif;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  --shadow2:0 8px 40px rgba(0,0,0,0.12);
-  --radius: 8px;
-  --ease:   cubic-bezier(0.25,0.46,0.45,0.94);
-}
+        html {
+          scroll-behavior: smooth;
+        }
 
-body {
-  background: var(--bg);
-  color: var(--dark);
-  font-family: var(--ff-b);
-  font-size: 16px;
-  line-height: 1.7;
-  overflow-x: hidden;
-}
+        body {
+          margin: 0;
+          background: #08090d;
+          color: #fff;
+          font-family: "Open Sans", Arial, sans-serif;
+        }
 
-/* ── NAVIGATION ── */
-nav {
-  position: sticky; top: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 3rem;
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
-}
-.logo {
-  font-family: var(--ff-h);
-  font-size: 1.4rem; font-weight: 800;
-  color: var(--dark2); letter-spacing: -0.02em;
-}
-.logo span { color: var(--pink); }
-.logo sup { font-size: 0.4em; color: var(--blue); vertical-align: super; margin-left:1px; font-family: var(--ff-b); }
-.nav-links { display: flex; gap: 0.15rem; list-style: none; }
-.nav-links a {
-  font-family: var(--ff-b); font-size: 0.78rem; font-weight: 600;
-  letter-spacing: 0.02em; color: var(--dark2);
-  padding: 0.45rem 0.85rem; border-radius: 4px;
-  transition: color .2s, background .2s;
-}
-.nav-links a:hover { color: var(--pink); background: var(--pink-light); }
-.nav-links a.on { color: var(--pink); background: var(--pink-light); }
-.btn-nav {
-  font-family: var(--ff-b); font-size: 0.78rem; font-weight: 700;
-  padding: 0.6rem 1.5rem; background: var(--blue); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; text-transform: lowercase;
-  transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 14px rgba(2,159,231,0.3);
-}
-.btn-nav:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2,159,231,0.4); }
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
 
-/* ── PAGES ── */
-.pg { display: none; animation: fadeUp .38s var(--ease) forwards; }
-.pg.on { display: block; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+        /* NAV */
 
-/* ── COMMON LAYOUT ── */
-section { padding: 5.5rem 3rem; }
-.container { max-width: 1140px; margin: 0 auto; }
+        .tm-nav {
+          position: fixed;
+          z-index: 1000;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(1180px, calc(100% - 32px));
+          padding: 14px 18px;
+          border-radius: 22px;
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(10,11,17,.76);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
 
-/* ── SECTION LABELS ── */
-.eyebrow {
-  display: inline-block;
-  width: 48px; height: 3px;
-  background: var(--pink);
-  margin-bottom: 1rem;
-  border-radius: 2px;
-}
-.eyebrow-text {
-  font-family: var(--ff-s); font-size: 0.72rem; font-weight: 500;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 0.5rem;
-}
+        .tm-nav-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
 
-/* ── TYPOGRAPHY ── */
-h1 {
-  font-family: var(--ff-h); font-size: clamp(2.8rem,6vw,5.5rem);
-  font-weight: 900; line-height: 1.0; letter-spacing: -0.02em;
-  color: var(--pink);
-}
-h2 {
-  font-family: var(--ff-h); font-size: clamp(1.9rem,3vw,2.8rem);
-  font-weight: 700; line-height: 1.15; letter-spacing: -0.015em;
-  color: var(--dark2); margin-bottom: 1rem;
-}
-h2 .accent { color: var(--pink); }
-h3 { font-family: var(--ff-s); font-size: 1.05rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.5rem; }
-h4 { font-family: var(--ff-s); font-size: 0.9rem; font-weight: 600; color: var(--dark2); margin-bottom: 0.35rem; }
-p { color: var(--muted); }
-.lead { font-size: 1rem; color: var(--muted); max-width: 560px; line-height: 1.82; font-weight: 300; margin-bottom: 2.5rem; }
+        .tm-logo {
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: -1.5px;
+        }
 
-/* ── BUTTONS ── */
-.bp {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 700;
-  padding: 0.8rem 2rem; background: var(--blue); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 16px rgba(2,159,231,0.3);
-}
-.bp:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(2,159,231,0.4); }
-.bp-pink {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 700;
-  padding: 0.8rem 2rem; background: var(--pink); color: #fff;
-  border: none; border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 16px rgba(240,25,101,0.3);
-}
-.bp-pink:hover { background: var(--pink-dark); transform: translateY(-1px); }
-.bg {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--ff-b); font-size: 0.82rem; font-weight: 600;
-  padding: 0.8rem 2rem; background: transparent; color: var(--dark2);
-  border: 2px solid var(--dark2); border-radius: 30px; cursor: pointer;
-  letter-spacing: 0.03em; transition: all .2s;
-}
-.bg:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-light); }
+        .tm-logo span {
+          color: #f01965;
+        }
 
-/* ── CARDS ── */
-.card {
-  background: #fff; border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 2rem;
-  transition: transform .25s, box-shadow .25s, border-color .25s;
-  box-shadow: var(--shadow);
-}
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-color: var(--border2); }
-.card-pink-top { border-top: 3px solid var(--pink); }
-.card-blue-top { border-top: 3px solid var(--blue); }
+        .tm-links {
+          display: flex;
+          align-items: center;
+          gap: 21px;
+        }
 
-/* ── GRID ── */
-.grid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 2rem; }
-.grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+        .tm-links a {
+          color: rgba(255,255,255,.7);
+          font-size: 13px;
+          font-weight: 700;
+          transition: .25s ease;
+        }
 
-/* ── TAGS ── */
-.tag {
-  display: inline-block; font-family: var(--ff-b); font-size: 0.65rem;
-  font-weight: 600; padding: 0.22rem 0.65rem; border-radius: 20px;
-  letter-spacing: 0.05em; text-transform: uppercase;
-}
-.tag-pink { background: var(--pink-light); color: var(--pink); }
-.tag-blue { background: var(--blue-light); color: var(--blue-dark); }
-.tag-gray { background: var(--bg3); color: var(--muted); }
-.tag-green { background: #e8faf2; color: #1a8a55; }
-.tag-purple { background: #f0eaff; color: #6c3fc5; }
+        .tm-links a:hover,
+        .tm-active {
+          color: #fff !important;
+        }
 
-/* ── DIVIDER ── */
-.divider { width: 48px; height: 3px; background: var(--pink); border-radius: 2px; margin: 0 0 1.5rem; }
-.divider-center { margin: 0 auto 1.5rem; }
+        .tm-talk {
+          border: 0;
+          padding: 13px 20px;
+          border-radius: 13px;
+          background: linear-gradient(
+            135deg,
+            #f01965,
+            #b70b6d
+          );
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
+        }
 
-/* ── HERO SECTION ── */
-.hero {
-  min-height: 90vh; display: grid; grid-template-columns: 1fr 1fr;
-  align-items: center; gap: 4rem;
-  padding: 5rem 3rem; background: var(--bg);
-  position: relative; overflow: hidden;
-}
-.hero::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--grad); opacity: 0.25; z-index: 0;
-}
-.hero-content { position: relative; z-index: 2; }
-.hero-visual {
-  position: relative; z-index: 2;
-  background: var(--grad); border-radius: 20px;
-  height: 420px; display: flex; align-items: center; justify-content: center;
-  overflow: hidden; box-shadow: var(--shadow2);
-}
-.hero-vis-inner { text-align: center; }
-.hero-eyebrow { font-family: var(--ff-b); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
-.hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--pink); flex-shrink: 0; }
-.hero h1 { margin-bottom: 1.5rem; }
-.hero-sub { font-size: 1rem; color: var(--muted); max-width: 460px; line-height: 1.82; margin-bottom: 2.5rem; font-weight: 300; }
-.hero-acts { display: flex; gap: 1rem; flex-wrap: wrap; }
-.hero-stats { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; gap: 2.5rem; flex-wrap: wrap; }
-.stat-n { font-family: var(--ff-h); font-size: 2rem; font-weight: 900; color: var(--pink); line-height: 1; }
-.stat-l { font-family: var(--ff-b); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2); margin-top: 0.2rem; }
+        .tm-menu {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.05);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+        }
 
-/* ── PAGE HERO ── */
-.page-hero { background: var(--grad); padding: 6rem 3rem 4rem; position: relative; overflow: hidden; }
-.page-hero::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.55); z-index: 0; }
-.page-hero > * { position: relative; z-index: 2; }
-.page-hero h1 { color: var(--pink); font-size: clamp(2.2rem,4.5vw,3.8rem); margin-bottom: 1rem; }
+        .tm-mobile-menu {
+          display: none;
+        }
 
-/* ── SERVICE LIST ── */
-.svc-wrap { display: grid; grid-template-columns: 1fr 360px; gap: 3.5rem; align-items: start; }
-.svc-item { display: flex; gap: 1.25rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); transition: opacity .2s; }
-.svc-item:last-child { border-bottom: none; }
-.svc-item:hover { opacity: 0.85; }
-.svc-num { font-family: var(--ff-h); font-size: 0.62rem; font-weight: 800; color: var(--pink); letter-spacing: 0.08em; min-width: 26px; padding-top: 3px; }
-.svc-d p { font-size: 0.82rem; color: var(--muted); line-height: 1.72; }
+        /* HERO */
 
-/* ── ASIDE BOX ── */
-.aside-box { position: sticky; top: 80px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); }
-.aside-label { font-family: var(--ff-s); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted2); margin-bottom: 1rem; }
-.model-item { background: #fff; border-radius: 6px; padding: 0.9rem 1rem; margin-bottom: 0.65rem; border-left: 3px solid var(--pink); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
-.model-item.blue { border-left-color: var(--blue); }
-.model-item.gray { border-left-color: var(--muted2); }
-.model-nm { font-family: var(--ff-s); font-size: 0.85rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.15rem; }
-.model-st { font-size: 0.68rem; color: var(--muted); }
+        .tm-hero {
+          position: relative;
+          min-height: 88vh;
+          display: flex;
+          align-items: center;
+          padding: 155px 7vw 100px;
+          overflow: hidden;
+        }
 
-/* ── VESTING ── */
-.vest3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; }
-.vc { background: #fff; padding: 1.1rem 1rem; }
-.vpc { font-family: var(--ff-h); font-size: 1.5rem; font-weight: 900; color: var(--pink); margin-bottom: 0.25rem; }
-.vc:nth-child(2) { background: var(--bg2); }
-.vc:nth-child(2) .vpc { color: var(--blue); }
-.vl { font-family: var(--ff-s); font-size: 0.72rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--dark2); }
-.vt { font-size: 0.7rem; color: var(--muted); line-height: 1.5; }
+        .tm-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255,255,255,.035) 1px,
+              transparent 1px
+            );
+          background-size: 60px 60px;
+          mask-image: linear-gradient(
+            to bottom,
+            black,
+            transparent
+          );
+        }
 
-/* ── MARKET CARDS ── */
-.mkt-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.mkt-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.mkt-f { font-family: var(--ff-h); font-size: 2.2rem; font-weight: 900; color: var(--pink); margin-bottom: 0.2rem; }
-.mkt-r { font-family: var(--ff-b); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted2); margin-bottom: 1rem; }
-.mkt-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+        .tm-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(90px);
+          opacity: .22;
+        }
 
-/* ── PRODUCT CARDS ── */
-.prod-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2.5rem; display: grid; grid-template-columns: 1fr 280px; gap: 2.5rem; align-items: start; margin-bottom: 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.prod-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
-.prod-card.featured { border-top: 3px solid var(--pink); }
-.pname { font-family: var(--ff-h); font-size: 1.4rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.35rem; letter-spacing: -0.01em; }
-.ptag { font-family: var(--ff-b); font-size: 0.72rem; color: var(--muted); margin-bottom: 0.9rem; line-height: 1.6; }
-.pdesc { font-size: 0.85rem; color: var(--muted); line-height: 1.82; margin-bottom: 1.25rem; }
-.pfeats { display: flex; flex-direction: column; gap: 0.45rem; }
-.pf { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
-.pf::before { content: '›'; color: var(--pink); font-weight: 700; font-size: 1rem; flex-shrink: 0; line-height: 1.4; }
-.pasides { display: flex; flex-direction: column; gap: 0.85rem; }
-.pa { background: var(--bg2); border-radius: 6px; padding: 1rem; }
-.pal { font-family: var(--ff-b); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted2); margin-bottom: 0.55rem; }
-.pat { display: inline-block; font-family: var(--ff-b); font-size: 0.62rem; padding: 0.18rem 0.55rem; border: 1px solid var(--border); border-radius: 15px; color: var(--muted); margin: 0.15rem; background: #fff; }
-.status-live { display: flex; align-items: center; gap: 0.35rem; font-family: var(--ff-b); font-size: 0.68rem; font-weight: 600; color: #1a8a55; }
-.status-dev { display: flex; align-items: center; gap: 0.35rem; font-family: var(--ff-b); font-size: 0.68rem; color: var(--muted); }
-.sdot { width: 7px; height: 7px; border-radius: 50%; background: #1a8a55; animation: pulse 2s infinite; flex-shrink: 0; }
-.sdot.d { background: var(--blue); animation: none; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.35} }
+        .tm-orb-one {
+          width: 420px;
+          height: 420px;
+          left: -170px;
+          top: 100px;
+          background: #f01965;
+          animation: tmFloat 8s ease-in-out infinite alternate;
+        }
 
-/* ── TEAM CARDS ── */
-.team-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-.team-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 2.25rem 2rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; position: relative; overflow: hidden; }
-.team-card:hover { transform: translateY(-5px); box-shadow: var(--shadow2); }
-.team-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--grad2); }
-.tc-av { width: 68px; height: 68px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; border: 2px solid var(--pink-light); box-shadow: 0 4px 14px rgba(240,25,101,0.15); }
-.tc-init { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 900; color: var(--pink); letter-spacing: -0.02em; }
-.tc-name { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.2rem; letter-spacing: -0.01em; line-height: 1.25; }
-.tc-title { font-family: var(--ff-b); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--pink); margin-bottom: 0.1rem; }
-.tc-org { font-family: var(--ff-b); font-size: 0.68rem; color: var(--muted2); margin-bottom: 1.1rem; }
-.tc-bio { font-size: 0.8rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.1rem; }
-.tc-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.1rem; }
-.tc-career { border-top: 1px solid var(--border); padding-top: 1.1rem; }
-.ci { display: flex; gap: 0.65rem; margin-bottom: 0.55rem; }
-.ci:last-child { margin-bottom: 0; }
-.ci-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink); flex-shrink: 0; margin-top: 6px; }
-.ci-role { font-size: 0.76rem; font-weight: 600; color: var(--dark2); line-height: 1.3; }
-.ci-co { font-size: 0.68rem; color: var(--muted); margin-top: 0.1rem; }
-.tc-link { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--ff-b); font-size: 0.65rem; font-weight: 600; color: var(--blue); border: 1px solid rgba(2,159,231,0.25); border-radius: 20px; padding: 0.28rem 0.7rem; transition: background .2s; margin-top: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.tc-link:hover { background: var(--blue-light); }
+        .tm-orb-two {
+          width: 400px;
+          height: 400px;
+          right: -170px;
+          top: 180px;
+          background: #029fe7;
+          animation: tmFloat 10s ease-in-out infinite alternate-reverse;
+        }
 
-/* ── ECO BANDS ── */
-.eco-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.eco { display: flex; gap: 1.5rem; padding: 1.6rem 2rem; border-bottom: 1px solid var(--border); background: #fff; transition: background .2s; }
-.eco:last-child { border-bottom: none; }
-.eco:hover { background: var(--bg2); }
-.eco-i { font-size: 1.1rem; flex-shrink: 0; width: 28px; margin-top: 2px; text-align: center; }
-.eco-b p { font-size: 0.83rem; color: var(--muted); line-height: 1.72; max-width: 560px; }
-.eco-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
-.eco-tag { font-size: 0.65rem; padding: 0.18rem 0.6rem; border: 1px solid var(--border); border-radius: 15px; color: var(--muted); background: var(--bg2); font-family: var(--ff-b); font-weight: 500; }
+        @keyframes tmFloat {
+          to {
+            transform: translate(70px,-50px) scale(1.18);
+          }
+        }
 
-/* ── TIER CARDS ── */
-.tier-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.75rem; }
-.tier { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; transition: transform .25s, box-shadow .25s; }
-.tier:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.tier.feat { border-color: var(--pink); border-top: 3px solid var(--pink); }
-.tier.feat::after { content: 'Most Common'; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); font-family: var(--ff-b); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 0.2rem 0.7rem; border-radius: 0 0 6px 6px; }
-.tier-stage { font-family: var(--ff-b); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.4rem; }
-.tier-name { font-family: var(--ff-h); font-size: 1rem; font-weight: 800; color: var(--dark2); margin-bottom: 1rem; }
-.tier-feats { flex: 1; display: flex; flex-direction: column; gap: 0.45rem; }
-.tier-feat { display: flex; align-items: flex-start; gap: 0.45rem; font-size: 0.76rem; color: var(--muted); }
-.tier-feat::before { content: '›'; color: var(--pink); font-weight: 700; font-size: 0.95rem; flex-shrink: 0; line-height: 1.4; }
+        .tm-hero-inner {
+          position: relative;
+          z-index: 2;
+          max-width: 1180px;
+          width: 100%;
+          margin: auto;
+        }
 
-/* ── CTA SECTION ── */
-.cta-sec { background: var(--dark2); padding: 6rem 3rem; text-align: center; position: relative; overflow: hidden; }
-.cta-sec::before { content: ''; position: absolute; inset: 0; background: var(--grad); opacity: 0.08; }
-.cta-sec h2 { color: #fff; max-width: 560px; margin: 0 auto 1rem; }
-.cta-sec h2 .accent { color: var(--pink); }
-.cta-sec p { color: rgba(255,255,255,0.65); max-width: 440px; margin: 0 auto 2.5rem; font-size: 0.95rem; }
-.cta-acts { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.cta-note { margin-top: 1.5rem; font-size: 0.72rem; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; font-family: var(--ff-b); }
+        .tm-eyebrow {
+          display: inline-flex;
+          padding: 8px 13px;
+          border-radius: 100px;
+          border: 1px solid rgba(255,255,255,.13);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.65);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .15em;
+          text-transform: uppercase;
+        }
 
-/* ── FOOTER ── */
-footer { background: #111; color: rgba(255,255,255,0.7); padding: 2.5rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-.f-brand { font-family: var(--ff-h); font-size: 1.1rem; font-weight: 800; color: #fff; }
-.f-brand span { color: var(--pink); }
-.f-links { display: flex; gap: 1.5rem; }
-.f-links a { font-family: var(--ff-b); font-size: 0.72rem; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; transition: color .2s; }
-.f-links a:hover { color: var(--pink); }
-.f-meta { font-family: var(--ff-b); font-size: 0.68rem; color: rgba(255,255,255,0.35); }
+        .tm-hero h1 {
+          max-width: 1000px;
+          margin: 25px 0 0;
+          font-size: clamp(60px,8vw,110px);
+          line-height: .88;
+          letter-spacing: -6px;
+          font-weight: 900;
+        }
 
-/* ── INSIGHTS ── */
-.feat-post { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 2.5rem; box-shadow: var(--shadow); cursor: pointer; transition: box-shadow .25s, transform .25s; }
-.feat-post:hover { transform: translateY(-3px); box-shadow: var(--shadow2); }
-.feat-img { background: var(--grad); min-height: 280px; display: flex; align-items: center; justify-content: center; font-size: 52px; }
-.feat-body { padding: 2.5rem; background: #fff; display: flex; flex-direction: column; justify-content: space-between; }
-.post-cat { font-family: var(--ff-b); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.75rem; }
-.post-title { font-family: var(--ff-h); font-size: 1.2rem; font-weight: 800; color: var(--dark2); line-height: 1.3; margin-bottom: 0.75rem; }
-.post-exc { font-size: 0.83rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.25rem; }
-.post-meta { font-size: 0.72rem; color: var(--muted2); display: flex; gap: 0.65rem; }
-.post-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.75rem; }
-.post-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.post-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); }
-.pcimg { height: 140px; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 36px; }
-.pcb { padding: 1.25rem; }
-.pcb .post-title { font-size: 0.92rem; margin-bottom: 0.4rem; }
-.pcb .post-exc { font-size: 0.78rem; margin-bottom: 0.7rem; }
-.fbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-.fbtn { font-family: var(--ff-b); font-size: 0.72rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 20px; border: 2px solid var(--border); color: var(--muted); background: transparent; cursor: pointer; transition: all .2s; }
-.fbtn:hover, .fbtn.on { border-color: var(--pink); color: var(--pink); background: var(--pink-light); }
-.nl-strip { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; box-shadow: var(--shadow); }
-.nl-strip h3 { font-family: var(--ff-h); font-size: 1.1rem; font-weight: 800; color: var(--dark2); margin-bottom: 0.3rem; }
-.nl-strip p { font-size: 0.83rem; color: var(--muted); max-width: 380px; }
-.nlf { display: flex; gap: 0.6rem; }
-.nli { font-family: var(--ff-b); font-size: 0.85rem; padding: 0.7rem 1.1rem; background: #fff; border: 2px solid var(--border); border-radius: 30px; color: var(--dark); min-width: 210px; outline: none; transition: border-color .2s; }
-.nli:focus { border-color: var(--pink); }
-.nli::placeholder { color: var(--muted2); }
+        .tm-gradient {
+          background:
+            linear-gradient(
+              100deg,
+              #f01965,
+              #ff5791,
+              #029fe7
+            );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          animation: tmGradient 5s linear infinite;
+        }
 
-/* ── PODCAST ── */
-.pod-hero { background: var(--dark2); padding: 5.5rem 3rem 3.5rem; position: relative; overflow: hidden; }
-.pod-hero::before { content: ''; position: absolute; inset: 0; background: var(--grad); opacity: 0.12; }
-.pod-hero > * { position: relative; z-index: 2; }
-.pod-hero h1 { color: #fff; font-size: clamp(2rem,4vw,3.5rem); margin-bottom: 1rem; }
-.pod-hero p { color: rgba(255,255,255,0.65); }
-.pod-logo { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2rem; }
-.pod-ic { width: 56px; height: 56px; background: var(--pink); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 6px 20px rgba(240,25,101,0.4); }
-.pod-br { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pink); }
-.plats { display: flex; gap: 0.55rem; flex-wrap: wrap; margin-top: 2rem; }
-.plat { display: flex; align-items: center; gap: 0.4rem; font-family: var(--ff-b); font-size: 0.75rem; font-weight: 600; padding: 0.45rem 1rem; border: 2px solid rgba(255,255,255,0.2); border-radius: 20px; color: rgba(255,255,255,0.75); cursor: pointer; transition: all .2s; }
-.plat:hover { border-color: var(--pink); color: var(--pink); }
-.fmt-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.75rem; }
-.fmt-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); transition: transform .25s, box-shadow .25s; }
-.fmt-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-top: 3px solid var(--pink); }
-.fmt-i { font-size: 1.3rem; margin-bottom: 0.9rem; }
-.fmt-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.72; }
-.ep-list { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.ep { background: #fff; padding: 1.6rem 2rem; display: grid; grid-template-columns: 56px 1fr auto; gap: 1.25rem; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .2s; }
-.ep:last-child { border-bottom: none; }
-.ep:hover { background: var(--bg2); }
-.ep-nw { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
-.ep-n { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; color: var(--pink); letter-spacing: 0.06em; }
-.ep-pl { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--pink); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; color: var(--pink); transition: all .2s; }
-.ep:hover .ep-pl { background: var(--pink); color: #fff; }
-.ep-tg { font-family: var(--ff-b); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.28rem; }
-.ep-ti { font-family: var(--ff-s); font-size: 0.95rem; font-weight: 700; color: var(--dark2); margin-bottom: 0.28rem; }
-.ep-de { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
-.ep-in { text-align: right; }
-.ep-du { font-size: 0.73rem; color: var(--muted2); }
-.ep-da { font-size: 0.68rem; color: var(--muted2); margin-top: 0.18rem; }
-.ep-new { display: inline-block; font-family: var(--ff-b); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 0.12rem 0.45rem; border-radius: 10px; margin-top: 0.3rem; }
+        @keyframes tmGradient {
+          to {
+            background-position: 200% center;
+          }
+        }
 
-@media (max-width: 900px) {
-  section { padding: 4rem 1.5rem; }
-  nav { padding: 0.9rem 1.5rem; }
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; min-height: auto; }
-  .hero-visual { display: none; }
-  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
-  .svc-wrap { grid-template-columns: 1fr; }
-  .aside-box { position: static; }
-  .tier-grid { grid-template-columns: 1fr 1fr; }
-  .team-grid { grid-template-columns: 1fr 1fr; }
-  .prod-card { grid-template-columns: 1fr; }
-  .feat-post { grid-template-columns: 1fr; }
-  .post-grid { grid-template-columns: 1fr 1fr; }
-  footer { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
-  .cta-sec { padding: 4rem 1.5rem; }
-}
+        .tm-hero-copy {
+          max-width: 700px;
+          margin-top: 32px;
+          color: rgba(255,255,255,.58);
+          font-size: 16px;
+          line-height: 1.85;
+        }
 
-/* Override team grid for 3-col layout, last row centred */
-.team-section-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
-.founders-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 2rem; margin-bottom: 2rem; }
-.consulting-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; }
-@media(max-width:900px){
-  .founders-row { grid-template-columns: 1fr; }
-  .consulting-row { grid-template-columns: 1fr 1fr; }
-}
-@media(max-width:600px){
-  .consulting-row { grid-template-columns: 1fr; }
-}
+        /* COMMON */
 
-.nav-in{max-width:1140px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:68px}
-nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid #e2e8f0;box-shadow:0 1px 16px rgba(0,0,0,.06)}
-.logo{font-family:'Raleway',sans-serif;font-size:1.35rem;font-weight:900;color:#111;letter-spacing:-.02em}.logo span{color:#f01965}
-.nav-links{display:flex;gap:.15rem;list-style:none}
-.nav-links a{font-size:.78rem;font-weight:600;color:#444;padding:.45rem .8rem;border-radius:5px;transition:color .2s,background .2s;text-decoration:none}
-.nav-links a:hover,.nav-links a.on{color:#f01965;background:rgba(240,25,101,.06)}
-.btn-talk{font-family:'Open Sans',sans-serif;font-size:.78rem;font-weight:700;padding:.55rem 1.4rem;background:#111;color:white;border:none;border-radius:6px;cursor:pointer;transition:background .2s}
-.btn-talk:hover{background:#f01965}
-.f-in{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.f-brand{font-family:'Raleway',sans-serif;font-size:1.05rem;font-weight:900;color:white}.f-brand span{color:#f01965}
-.f-links{display:flex;gap:1.5rem;flex-wrap:wrap}.f-links a{font-size:.75rem;color:rgba(255,255,255,.45);transition:color .2s;text-decoration:none}.f-links a:hover{color:#f01965}
-.f-meta{font-size:.72rem}`}</style>
-<nav>
-  <div className="nav-in">
-   <a href="/" className="logo">Code<span>Cap</span></a>
+        .tm-section {
+          padding: 110px 7vw;
+        }
 
-<ul className="nav-links">
-  <li><a href="/venture-studio">Venture Studio</a></li>
-  <li><a href="/services">Services</a></li>
-  <li><a href="/products">Products</a></li>
-  <li><a href="/portfolio">Portfolio</a></li>
-  <li><a href="/team">Team</a></li>
-  <li><a href="/insights">Insights</a></li>
-  <li><a href="/podcast">Podcast</a></li>
-</ul>
-    <button className="btn-talk" onClick={() => (window.location.href = "mailto:hello@codecap.ai")}>Talk to us</button>
-  </div>
-</nav>
+        .tm-container {
+          max-width: 1180px;
+          margin: auto;
+        }
 
-<div className="page-hero">
-  <div className="eyebrow-text">The Team</div>
-  <div className="divider"></div>
-  <h1>Operators who've<br />been in the room.</h1>
-  <p style={{fontSize: "1rem", color: "var(--dark2)", maxWidth: "540px", lineHeight: "1.82", marginTop: "1rem", fontWeight: "300"}}>CodeCap is built by practitioners who have spent careers inside enterprise cybersecurity, global GTM, product development, and business development — across Trend Micro, Tenable, Wipro, and the startup ecosystem across SEA, the Gulf, and India.</p>
-</div>
+        .tm-label {
+          margin-bottom: 16px;
+          color: #f01965;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .16em;
+          text-transform: uppercase;
+        }
 
-<section>
-  {/* CO-FOUNDERS */}
-  <div className="eyebrow-text">Co-Founders</div>
-  <div className="divider"></div>
-  <div className="founders-row">
+        .tm-title {
+          margin: 0;
+          font-size: clamp(43px,5vw,72px);
+          line-height: .97;
+          letter-spacing: -3px;
+        }
 
-    {/* Baburaj Varma */}
-    <div className="team-card">
-      <div className="tc-av"><div className="tc-init">BV</div></div>
-      <div className="tc-name">Baburaj Varma</div>
-      <div className="tc-title">Co-Founder & Managing Partner</div>
-      <div className="tc-org">Singapore · Cybersecurity · Enterprise GTM · AMEA</div>
-      <div className="tc-bio">A 25+ year veteran of the enterprise cybersecurity industry, Baburaj built and led technical services teams across the AMEA region as VP Technical Leader at Trend Micro — one of the world's largest cybersecurity companies. Known for retaining large enterprise accounts through technical credibility and trust, and for turning complex security challenges into customer outcomes. Prior to Trend Micro, he served as Channel Sales Director India at Netskope. At CodeCap, Baburaj leads the overall firm, driving partnership strategy, enterprise client relationships, and product commercialisation across SEA and the Gulf.</div>
-      <div className="tc-tags">
-        <span className="tag tag-pink">Cybersecurity</span><span className="tag tag-blue">Enterprise GTM</span><span className="tag tag-blue">Technical Leadership</span><span className="tag tag-gray">AMEA</span><span className="tag tag-gray">Channel Strategy</span>
+        .tm-title span {
+          color: rgba(255,255,255,.3);
+        }
+
+        /* TEAM GRID */
+
+        .tm-team-grid {
+          margin-top: 60px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+        }
+
+        .tm-card {
+          position: relative;
+          padding: 32px;
+          min-height: 430px;
+          border-radius: 28px;
+          border: 1px solid rgba(255,255,255,.09);
+          background:
+            radial-gradient(
+              circle at 90% 10%,
+              rgba(240,25,101,.12),
+              transparent 30%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(255,255,255,.07),
+              rgba(255,255,255,.025)
+            );
+          overflow: hidden;
+          transform-style: preserve-3d;
+          transition: transform .25s ease, border .3s ease;
+        }
+
+        .tm-card:hover {
+          border-color: rgba(240,25,101,.3);
+        }
+
+        .tm-card::before {
+          content: "";
+          position: absolute;
+          width: 210px;
+          height: 210px;
+          right: -90px;
+          bottom: -90px;
+          border-radius: 50%;
+          background: #029fe7;
+          filter: blur(65px);
+          opacity: .09;
+        }
+
+        .tm-card-number {
+          color: #029fe7;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .12em;
+        }
+
+        .tm-avatar {
+          width: 80px;
+          height: 80px;
+          margin-top: 45px;
+          border-radius: 24px;
+          display: grid;
+          place-items: center;
+          background:
+            linear-gradient(
+              135deg,
+              #f01965,
+              #029fe7
+            );
+          font-size: 27px;
+          font-weight: 900;
+          box-shadow:
+            12px 12px 0 rgba(240,25,101,.1);
+        }
+
+        .tm-card h3 {
+          margin: 27px 0 5px;
+          font-size: 28px;
+          letter-spacing: -1px;
+        }
+
+        .tm-role {
+          color: #f01965;
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .tm-location {
+          margin-top: 13px;
+          color: rgba(255,255,255,.38);
+          font-size: 10px;
+          line-height: 1.6;
+        }
+
+        .tm-description {
+          margin-top: 22px;
+          color: rgba(255,255,255,.52);
+          font-size: 13px;
+          line-height: 1.75;
+        }
+
+        .tm-linkedin {
+          display: inline-flex;
+          margin-top: 22px;
+          padding: 9px 12px;
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,.1);
+          background: rgba(255,255,255,.04);
+          color: rgba(255,255,255,.72);
+          font-size: 10px;
+          font-weight: 900;
+          transition: .25s ease;
+        }
+
+        .tm-linkedin:hover {
+          background: #fff;
+          color: #08090d;
+          transform: translateY(-3px);
+        }
+
+        /* PRINCIPLES */
+
+        .tm-principles {
+          background: #f4f5f7;
+          color: #090a0e;
+        }
+
+        .tm-principles .tm-title span {
+          color: #737983;
+        }
+
+        .tm-principles-grid {
+          margin-top: 60px;
+          display: grid;
+          grid-template-columns: repeat(4,1fr);
+          gap: 15px;
+        }
+
+        .tm-principle {
+          min-height: 280px;
+          padding: 25px;
+          border-radius: 24px;
+          background: #fff;
+          border: 1px solid #e1e4e8;
+          transition: .3s ease;
+        }
+
+        .tm-principle:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 25px 60px rgba(0,0,0,.08);
+        }
+
+        .tm-principle-number {
+          color: #f01965;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .tm-principle h3 {
+          margin: 70px 0 12px;
+          font-size: 21px;
+          letter-spacing: -.5px;
+        }
+
+        .tm-principle p {
+          margin: 0;
+          color: #737983;
+          font-size: 12px;
+          line-height: 1.7;
+        }
+
+        /* QUOTE */
+
+        .tm-statement {
+          padding: 140px 7vw;
+          text-align: center;
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(2,159,231,.1),
+              transparent 38%
+            );
+        }
+
+        .tm-statement-inner {
+          max-width: 950px;
+          margin: auto;
+        }
+
+        .tm-statement-mark {
+          color: #f01965;
+          font-size: 60px;
+          line-height: .5;
+          font-weight: 900;
+        }
+
+        .tm-statement h2 {
+          margin: 30px 0;
+          font-size: clamp(40px,5vw,68px);
+          line-height: 1;
+          letter-spacing: -3px;
+        }
+
+        .tm-statement p {
+          max-width: 620px;
+          margin: auto;
+          color: rgba(255,255,255,.43);
+          line-height: 1.8;
+          font-size: 14px;
+        }
+
+        /* CTA */
+
+        .tm-cta {
+          padding: 120px 7vw;
+          border-top: 1px solid rgba(255,255,255,.07);
+          text-align: center;
+        }
+
+        .tm-cta h2 {
+          margin: 0;
+          font-size: clamp(45px,6vw,82px);
+          line-height: .95;
+          letter-spacing: -4px;
+        }
+
+        .tm-cta p {
+          max-width: 600px;
+          margin: 25px auto 32px;
+          color: rgba(255,255,255,.48);
+          line-height: 1.8;
+        }
+
+        .tm-cta-button {
+          display: inline-flex;
+          padding: 16px 25px;
+          border-radius: 14px;
+          background: #fff;
+          color: #08090d;
+          font-size: 11px;
+          font-weight: 900;
+          transition: .3s ease;
+        }
+
+        .tm-cta-button:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 60px rgba(255,255,255,.12);
+        }
+
+        /* FOOTER */
+
+        .tm-footer {
+          padding: 35px 7vw;
+          border-top: 1px solid rgba(255,255,255,.08);
+          background: #07080b;
+        }
+
+        .tm-footer-inner {
+          max-width: 1180px;
+          margin: auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
+
+        .tm-footer-logo {
+          font-size: 23px;
+          font-weight: 900;
+        }
+
+        .tm-footer-logo span {
+          color: #f01965;
+        }
+
+        .tm-footer-text {
+          color: rgba(255,255,255,.38);
+          font-size: 11px;
+          text-align: right;
+          line-height: 1.7;
+        }
+
+        /* REVEAL */
+
+        .tm-reveal {
+          opacity: 0;
+          transform: translateY(40px);
+          transition:
+            opacity .8s ease,
+            transform .8s cubic-bezier(.2,.8,.2,1);
+        }
+
+        .tm-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 1050px) {
+
+          .tm-links,
+          .tm-talk {
+            display: none;
+          }
+
+          .tm-menu {
+            display: block;
+          }
+
+          .tm-mobile-menu {
+            position: absolute;
+            display: block;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(10,11,17,.97);
+            backdrop-filter: blur(20px);
+          }
+
+          .tm-mobile-menu a {
+            display: block;
+            padding: 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,.7);
+            font-size: 13px;
+            font-weight: 700;
+          }
+
+          .tm-principles-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+        }
+
+        @media (max-width: 760px) {
+
+          .tm-nav {
+            top: 8px;
+            width: calc(100% - 18px);
+            border-radius: 18px;
+          }
+
+          .tm-hero {
+            min-height: auto;
+            padding: 130px 20px 85px;
+          }
+
+          .tm-hero h1 {
+            font-size: 55px;
+            letter-spacing: -3px;
+          }
+
+          .tm-hero-copy {
+            font-size: 14px;
+          }
+
+          .tm-section {
+            padding: 85px 20px;
+          }
+
+          .tm-title {
+            font-size: 44px;
+            letter-spacing: -2px;
+          }
+
+          .tm-team-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .tm-card {
+            min-height: auto;
+            padding: 27px;
+          }
+
+          .tm-principles-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .tm-principle {
+            min-height: 230px;
+          }
+
+          .tm-principle h3 {
+            margin-top: 55px;
+          }
+
+          .tm-statement {
+            padding: 100px 20px;
+          }
+
+          .tm-statement h2 {
+            font-size: 43px;
+          }
+
+          .tm-cta {
+            padding: 90px 20px;
+          }
+
+          .tm-cta h2 {
+            font-size: 50px;
+          }
+
+          .tm-footer {
+            padding: 28px 20px;
+          }
+
+          .tm-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .tm-footer-text {
+            text-align: left;
+          }
+
+        }
+
+      `}</style>
+
+      <div>
+
+        {/* NAVBAR */}
+
+        <nav className="tm-nav">
+
+          <div className="tm-nav-inner">
+
+            <a href="/" className="tm-logo">
+              Code<span>Cap</span>
+            </a>
+
+            <div className="tm-links">
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a href="/services">
+                Services
+              </a>
+
+              <a href="/products">
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a
+                href="/team"
+                className="tm-active"
+              >
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+            </div>
+
+            <button
+              className="tm-talk"
+              onClick={() =>
+                (window.location.href =
+                  "mailto:hello@codecap.ai")
+              }
+            >
+              Talk to us
+            </button>
+
+            <button
+              className="tm-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? "×" : "☰"}
+            </button>
+
+          </div>
+
+          {menuOpen && (
+            <div className="tm-mobile-menu">
+
+              <a href="/">
+                Home
+              </a>
+
+              <a href="/venture-studio">
+                Venture Studio
+              </a>
+
+              <a href="/services">
+                Services
+              </a>
+
+              <a href="/products">
+                Products
+              </a>
+
+              <a href="/portfolio">
+                Portfolio
+              </a>
+
+              <a href="/team">
+                Team
+              </a>
+
+              <a href="/insights">
+                Insights
+              </a>
+
+              <a href="/podcast">
+                Podcast
+              </a>
+
+              <a href="mailto:hello@codecap.ai">
+                Talk to us →
+              </a>
+
+            </div>
+          )}
+
+        </nav>
+
+        {/* HERO */}
+
+        <section className="tm-hero">
+
+          <div className="tm-grid"></div>
+
+          <div className="tm-orb tm-orb-one"></div>
+          <div className="tm-orb tm-orb-two"></div>
+
+          <div className="tm-hero-inner tm-reveal">
+
+            <div className="tm-eyebrow">
+              The People Behind CodeCap
+            </div>
+
+            <h1>
+              Operators.
+              <br />
+              <span className="tm-gradient">
+                Practitioners.
+              </span>
+              <br />
+              Builders.
+            </h1>
+
+            <p className="tm-hero-copy">
+              CodeCap is built by people who have spent
+              years inside cybersecurity, enterprise
+              technology, marketing, operations and
+              high-growth markets.
+            </p>
+
+          </div>
+
+        </section>
+
+        {/* TEAM */}
+
+        <section className="tm-section">
+
+          <div className="tm-container">
+
+            <div className="tm-reveal">
+
+              <div className="tm-label">
+                Our Team
+              </div>
+
+              <h2 className="tm-title">
+                Experience that
+                <br />
+                <span>gets involved.</span>
+              </h2>
+
+            </div>
+
+            <div className="tm-team-grid">
+
+              {team.map((person) => (
+                <article
+                  className="tm-card tm-tilt tm-reveal"
+                  key={person.name}
+                >
+
+                  <div className="tm-card-number">
+                    TEAM / {person.number}
+                  </div>
+
+                  <div className="tm-avatar">
+                    {person.name
+                      .split(" ")
+                      .map((word) => word[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+
+                  <h3>
+                    {person.name}
+                  </h3>
+
+                  <div className="tm-role">
+                    {person.role}
+                  </div>
+
+                  <div className="tm-location">
+                    {person.location}
+                  </div>
+
+                  <p className="tm-description">
+                    {person.description}
+                  </p>
+
+                  <a
+                    href={person.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="tm-linkedin"
+                  >
+                    LinkedIn ↗
+                  </a>
+
+                </article>
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* PRINCIPLES */}
+
+        <section className="tm-section tm-principles">
+
+          <div className="tm-container">
+
+            <div className="tm-reveal">
+
+              <div className="tm-label">
+                How We Work
+              </div>
+
+              <h2 className="tm-title">
+                Our operating
+                <br />
+                <span>principles.</span>
+              </h2>
+
+            </div>
+
+            <div className="tm-principles-grid">
+
+              {principles.map((principle) => (
+                <div
+                  className="tm-principle tm-reveal"
+                  key={principle.number}
+                >
+
+                  <div className="tm-principle-number">
+                    {principle.number}
+                  </div>
+
+                  <h3>
+                    {principle.title}
+                  </h3>
+
+                  <p>
+                    {principle.text}
+                  </p>
+
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* STATEMENT */}
+
+        <section className="tm-statement">
+
+          <div className="tm-statement-inner tm-reveal">
+
+            <div className="tm-statement-mark">
+              “
+            </div>
+
+            <h2>
+              We don't just advise
+              <br />
+              founders.
+            </h2>
+
+            <p>
+              We embed with them — bringing the
+              experience, relationships and execution
+              required to turn ambitious ideas into
+              operating businesses.
+            </p>
+
+          </div>
+
+        </section>
+
+        {/* CTA */}
+
+        <section className="tm-cta">
+
+          <div className="tm-reveal">
+
+            <div className="tm-label">
+              Work With Us
+            </div>
+
+            <h2>
+              Let's build
+              <br />
+              something real.
+            </h2>
+
+            <p>
+              Building an early-stage company in AI,
+              cybersecurity or enterprise SaaS?
+              Let's talk.
+            </p>
+
+            <a
+              href="mailto:hello@codecap.ai"
+              className="tm-cta-button"
+            >
+              Start a Conversation →
+            </a>
+
+          </div>
+
+        </section>
+
+        {/* FOOTER */}
+
+        <footer className="tm-footer">
+
+          <div className="tm-footer-inner">
+
+            <div className="tm-footer-logo">
+              Code<span>Cap</span>
+            </div>
+
+            <div className="tm-footer-text">
+              © 2025 CodeCap Ventures · Singapore · UAE · India
+              <br />
+              hello@codecap.ai
+            </div>
+
+          </div>
+
+        </footer>
+
       </div>
-      <div className="tc-career">
-        <div className="ci"><div className="ci-dot"></div><div><div className="ci-role">VP Technical Leader, AMEA Region</div><div className="ci-co">Trend Micro — Singapore</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--blue)"}}></div><div><div className="ci-role">Channel Sales Director, India</div><div className="ci-co">Netskope</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--muted2)"}}></div><div><div className="ci-role">Head of Technical Services, SEA & India</div><div className="ci-co">Trend Micro</div></div></div>
-      </div>
-      <a href="https://www.linkedin.com/in/baburajvarma/" target="_blank" rel="noreferrer" className="tc-link">LinkedIn Profile →</a>
-    </div>
-
-    {/* Tarun Gupta */}
-    <div className="team-card">
-      <div className="tc-av"><div className="tc-init">TG</div></div>
-      <div className="tc-name">Tarun Gupta</div>
-      <div className="tc-title">Co-Founder & Partner</div>
-      <div className="tc-org">India / SEA · Security Operations · Managed Security · Deep Tech</div>
-      <div className="tc-bio">Tarun is a cybersecurity operator and technologist with deep expertise in security operations and technology integration across AMEA. As Director of Security Operations as a Service at Trend Micro AMEA — building and scaling SOC programmes for enterprise clients — he worked alongside Baburaj Varma across Southeast Asia and the Indian subcontinent. Prior to CodeCap, he served as Chief Delivery Officer at TRUGlobal, a global digital transformation company. At CodeCap, Tarun leads technical engagements across the cybersecurity portfolio — from the Autonomous ILCM Platform to Abhra and Cloud-BOM — bringing practitioner depth that founders and buyers trust.</div>
-      <div className="tc-tags">
-        <span className="tag tag-pink">Security Operations</span><span className="tag tag-blue">MDR / SOC</span><span className="tag tag-blue">Tech Integration</span><span className="tag tag-gray">AMEA</span><span className="tag tag-gray">Enterprise Delivery</span>
-      </div>
-      <div className="tc-career">
-        <div className="ci"><div className="ci-dot"></div><div><div className="ci-role">Chief Delivery Officer</div><div className="ci-co">TRUGlobal — Global Digital Transformation</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--blue)"}}></div><div><div className="ci-role">Director, Security Operations as a Service, AMEA</div><div className="ci-co">Trend Micro</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--muted2)"}}></div><div><div className="ci-role">Director, Technology Integration Service, AMEA</div><div className="ci-co">Trend Micro</div></div></div>
-      </div>
-      <a href="https://www.linkedin.com/in/tarun-gupta-66b924a/" target="_blank" rel="noreferrer" className="tc-link">LinkedIn Profile →</a>
-    </div>
-  </div>
-
-  {/* CONSULTING PARTNERS */}
-  <div className="eyebrow-text" style={{marginTop: "3rem"}}>Consulting Partners</div>
-  <div className="divider"></div>
-  <div className="consulting-row">
-
-    {/* Atin Verma */}
-    <div className="team-card">
-      <div className="tc-av"><div className="tc-init">AV</div></div>
-      <div className="tc-name">Atin Verma</div>
-      <div className="tc-title">Consulting Partner</div>
-      <div className="tc-org">Marketing & Brand</div>
-      <div className="tc-bio">Senior marketing and GTM leader with a career built at the intersection of enterprise cybersecurity and high-growth go-to-market. At Tenable, he led marketing strategy across India and South Asia, producing customer events that became industry benchmarks. Renowned for translating complex cybersecurity solutions into compelling commercial narratives.</div>
-      <div className="tc-tags">
-        <span className="tag tag-pink">GTM Strategy</span><span className="tag tag-blue">Brand & Marketing</span><span className="tag tag-gray">Demand Gen</span>
-      </div>
-      <div className="tc-career">
-        <div className="ci"><div className="ci-dot" style={{background: "var(--blue)"}}></div><div><div className="ci-role">Senior Marketing Leader, India & South Asia</div><div className="ci-co">Tenable — Cybersecurity</div></div></div>
-      </div>
-      <a href="https://www.linkedin.com/in/atinverma9/" target="_blank" rel="noreferrer" className="tc-link">LinkedIn →</a>
-    </div>
-
-    {/* Naveena Chowdary */}
-    <div className="team-card">
-      <div className="tc-av"><div className="tc-init">NC</div></div>
-      <div className="tc-name">Naveena Chowdary Koyyalamudi</div>
-      <div className="tc-title">Consulting Partner</div>
-      <div className="tc-org">Operations</div>
-      <div className="tc-bio">Information security professional and operations leader with a computer science foundation from the University of Colorado Denver. Naveena bridges technical security expertise with operational delivery — her experience spans information security programme management, AI research applications, and cross-functional operations in regulated industries. At Plantillegence, she worked at the intersection of AI technology and agri-tech, applying information security frameworks to an emerging-tech environment. Prior to that, at Optum Global Solutions International B.V. (UnitedHealth Group), she built grounding in enterprise-scale operations and information systems in a regulated healthcare context. At CodeCap, Naveena leads operations — keeping engagement delivery structured, compliant, and on track.</div>
-      <div className="tc-tags">
-        <span className="tag tag-purple">Information Security</span><span className="tag tag-blue">Operations Management</span><span className="tag tag-blue">AI Applications</span><span className="tag tag-gray">Regulated Industries</span>
-      </div>
-      <div className="tc-career">
-        <div className="ci"><div className="ci-dot"></div><div><div className="ci-role">Information Security & AI Research</div><div className="ci-co">Plantillegence — AI-driven AgriTech Platform</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--blue)"}}></div><div><div className="ci-role">Enterprise Operations & Information Systems</div><div className="ci-co">Optum Global Solutions International B.V. (UnitedHealth Group)</div></div></div>
-        <div className="ci"><div className="ci-dot" style={{background: "var(--muted2)"}}></div><div><div className="ci-role">Computer Science — Information Security</div><div className="ci-co">University of Colorado Denver</div></div></div>
-      </div>
-      <a href="https://www.linkedin.com/in/naveenack/" target="_blank" rel="noreferrer" className="tc-link">LinkedIn Profile →</a>
-    </div>
-    </div>
-
-</section>
-
-{/* VALUES */}
-<section style={{background: "var(--bg2)"}}>
-  <div style={{textAlign: "center", maxWidth: "580px", margin: "0 auto 3rem"}}>
-    <div className="eyebrow-text">Operating Principles</div>
-    <div className="divider divider-center"></div>
-    <h2>What we <span className="accent">believe in.</span></h2>
-  </div>
-  <div className="grid4">
-    <div className="card card-pink-top"><h3>Execution over advice</h3><p>We ship code, close deals, and build products. Our upside is tied to your outcomes — not our hours billed.</p></div>
-    <div className="card card-blue-top"><h3>Practitioners who sell</h3><p>Every partner has built, operated, or sold in the markets we work in. Depth is non-negotiable.</p></div>
-    <div className="card card-pink-top"><h3>Compliant by design</h3><p>MAS, DIFC/ADGM, and Indian regulatory constraints are built into every deal structure from the start.</p></div>
-    <div className="card card-blue-top"><h3>Selective, not scalable</h3><p>We take on a small number of engagements by design. Every founder gets the full attention of the team.</p></div>
-  </div>
-</section>
-
-<section className="cta-sec">
-  <div style={{position: "relative", zIndex: "2"}}>
-    <div style={{fontFamily: "var(--ff-b)", fontSize: "0.72rem", fontWeight: "600", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pink)", marginBottom: "1rem"}}>Work With Us</div>
-    <h2>Want to build something <span className="accent">with this team?</span></h2>
-    <p>We're selectively taking on new engagements. If you're an early-stage founder or a product company looking for a commercial partner in SEA or the Gulf — let's talk.</p>
-    <div className="cta-acts">
-      <a href="mailto:hello@codecap.ai" className="bp">Start a Conversation →</a>
-      <a href="venture-studio.html" className="bp-pink">Explore the Studio</a>
-    </div>
-    <p className="cta-note">hello@codecap.ai · Singapore · UAE · India</p>
-  </div>
-</section>
-
-<footer>
-  <div className="f-in">
-    <div className="f-brand">Code<span>Cap</span></div>
-    <div className="f-links">
-      <a href="/venture-studio">Venture Studio</a>
-<a href="/services">Services</a>
-<a href="/products">Products</a>
-<a href="/portfolio">Portfolio</a>
-<a href="/team">Team</a>
-<a href="/insights">Insights</a>
-<a href="/podcast">Podcast</a>
-    </div>
-    <div className="f-meta">© 2025 CodeCap Ventures · Singapore · UAE · India · hello@codecap.ai</div>
-  </div>
-</footer>
     </>
   );
 }
